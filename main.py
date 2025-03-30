@@ -31,9 +31,51 @@ class RegistrationForms(QtWidgets.QLabel):
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
         user_screen_geometry = user_screen.availableGeometry()
-        self.setMinimumSize(600, user_screen_geometry.height() * (4.3 / 5))
+        self.setMinimumSize(645, user_screen_geometry.height())
 
-        self.move(30, (parent.height() // 2 - self.height() // 2) - 10)
+        self.move(0, 0)
+
+        title = QtWidgets.QLabel("Cadastro de Motorista", parent=self)
+        title.setFixedWidth(315)
+        title.setStyleSheet(css.registration_title)
+        title.move(self.width() // 2 - title.width() // 2, 50)
+
+        margin_left = 30
+        space_between_elements = 5
+        inputs_width = self.width() - margin_left * 2
+        inputs_height = 30
+
+        driver_informations_section = QtWidgets.QLabel(parent=self)
+        driver_informations_section.setStyleSheet(css.driver_informations_section)
+        driver_informations_section.setFixedSize(self.width(), self.height() - 130)
+        driver_informations_section.move(0, 130)
+
+        fullname = QtWidgets.QLabel("Nome completo", parent=driver_informations_section)
+        fullname.setStyleSheet(css.registration_label_guide)
+        fullname.move(margin_left, 0)
+
+        input_fullname = QtWidgets.QLineEdit(parent=driver_informations_section)
+        input_fullname.setStyleSheet(css.registration_input)
+        input_fullname.setFixedSize(inputs_width, inputs_height)
+        input_fullname.setMaxLength(100)
+        input_fullname.move(
+            margin_left, fullname.y() + fullname.height() + space_between_elements
+        )
+
+        # title = QtWidgets.QLabel("Cadastro de veículo", parent=self)
+        # title.setFixedWidth(315)
+        # title.setStyleSheet(css.registration_title)
+        # title.move(self.width() // 2 - title.width() // 2, 40)
+
+        # title = QtWidgets.QLabel("Cadastro de veículo", parent=self)
+        # title.setFixedWidth(315)
+        # title.setStyleSheet(css.registration_title)
+        # title.move(self.width() // 2 - title.width() // 2, 40)
+
+        # title = QtWidgets.QLabel("Cadastro de veículo", parent=self)
+        # title.setFixedWidth(315)
+        # title.setStyleSheet(css.registration_title)
+        # title.move(self.width() // 2 - title.width() // 2, 40)
 
 
 connection.close()
