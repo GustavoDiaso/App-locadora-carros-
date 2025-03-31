@@ -35,11 +35,6 @@ class RegistrationForms(QtWidgets.QLabel):
 
         self.move(0, 0)
 
-        title = QtWidgets.QLabel("Cadastro de Motorista", parent=self)
-        title.setFixedWidth(315)
-        title.setStyleSheet(css.registration_title)
-        title.move(self.width() // 2 - title.width() // 2, 50)
-
         margin_left = 30
         space_between_elements = 5
         inputs_width = self.width() - margin_left * 2
@@ -47,25 +42,41 @@ class RegistrationForms(QtWidgets.QLabel):
 
         driver_informations_section = QtWidgets.QLabel(parent=self)
         driver_informations_section.setStyleSheet(css.driver_informations_section)
-        driver_informations_section.setFixedSize(self.width(), self.height() - 130)
-        driver_informations_section.move(0, 130)
+        driver_informations_section.setFixedSize(self.width(), self.height())
+        driver_informations_section.move(0, 0)
 
-        fullname = QtWidgets.QLabel("Nome completo", parent=driver_informations_section)
-        fullname.setStyleSheet(css.registration_label_guide)
-        fullname.move(margin_left, 0)
+        driver_section_title = QtWidgets.QLabel(
+            "Cadastro de motorista", parent=driver_informations_section
+        )
+        driver_section_title.setFixedWidth(355)
+        driver_section_title.setStyleSheet(css.registration_title)
+        driver_section_title.move(
+            self.width() // 2 - driver_section_title.width() // 2, 50
+        )
+
+        lbl_fullname = QtWidgets.QLabel(
+            "Nome completo:", parent=driver_informations_section
+        )
+        lbl_fullname.setStyleSheet(css.registration_label_guide)
+        lbl_fullname.move(
+            margin_left, driver_section_title.y() + driver_section_title.height() + 50
+        )
 
         input_fullname = QtWidgets.QLineEdit(parent=driver_informations_section)
         input_fullname.setStyleSheet(css.registration_input)
         input_fullname.setFixedSize(inputs_width, inputs_height)
         input_fullname.setMaxLength(100)
         input_fullname.move(
-            margin_left, fullname.y() + fullname.height() + space_between_elements
+            margin_left,
+            lbl_fullname.y() + lbl_fullname.height() + space_between_elements,
         )
 
-        # title = QtWidgets.QLabel("Cadastro de veículo", parent=self)
-        # title.setFixedWidth(315)
-        # title.setStyleSheet(css.registration_title)
-        # title.move(self.width() // 2 - title.width() // 2, 40)
+        lbl_cpf = QtWidgets.QLabel("CPF:", parent=driver_informations_section)
+        lbl_cpf.setStyleSheet(css.registration_label_guide)
+        lbl_cpf.move(
+            margin_left,
+            input_fullname.y() + inputs_height + (space_between_elements * 5),
+        )
 
         # title = QtWidgets.QLabel("Cadastro de veículo", parent=self)
         # title.setFixedWidth(315)
