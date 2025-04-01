@@ -1,6 +1,4 @@
 from PySide6 import QtWidgets, QtCore, QtGui
-from win32api import mouse_event
-
 from CSS import css
 from pathlib import Path
 import sqlite3
@@ -33,7 +31,9 @@ class RegistrationForms(QtWidgets.QLabel):
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
         user_screen_geometry = user_screen.availableGeometry()
-        self.setMinimumSize(645, user_screen_geometry.height())
+        self.setFixedSize(
+            user_screen_geometry.width() * 2 / 5, user_screen_geometry.height()
+        )
 
         self.move(0, 0)
 
@@ -41,128 +41,187 @@ class RegistrationForms(QtWidgets.QLabel):
         space_between_elements = 5
         inputs_width = self.width() - margin_left * 2
         inputs_height = 30
+        labels_height = 30
 
-        driver_informations_section = QtWidgets.QLabel(parent=self)
-        driver_informations_section.setStyleSheet(css.driver_informations_section)
-        driver_informations_section.setFixedSize(self.width(), self.height())
-        driver_informations_section.move(0, 0)
-
-        driver_section_title = QtWidgets.QLabel(
-            "Cadastro de motorista", parent=driver_informations_section
+        self.driver_registration_title = QtWidgets.QLabel(
+            "Cadastro de motorista", parent=self
         )
-        driver_section_title.setFixedWidth(355)
-        driver_section_title.setStyleSheet(css.registration_title)
-        driver_section_title.move(
-            self.width() // 2 - driver_section_title.width() // 2, 50
+        self.driver_registration_title.setFixedWidth(355)
+        self.driver_registration_title.setStyleSheet(css.registration_title)
+        self.driver_registration_title.move(
+            self.width() // 2 - self.driver_registration_title.width() // 2, 50
         )
 
-        lbl_fullname = QtWidgets.QLabel(
-            "Nome completo:", parent=driver_informations_section
+        self.driver_informations_section1 = QtWidgets.QLabel(parent=self)
+        self.driver_informations_section1.setStyleSheet(css.driver_informations_section)
+        self.driver_informations_section1.setFixedSize(
+            self.width(),
+            self.height()
+            - self.driver_registration_title.y()
+            + self.driver_registration_title.height()
+            + 55,
         )
-        lbl_fullname.setStyleSheet(css.registration_label_guide)
-        lbl_fullname.move(
-            margin_left, driver_section_title.y() + driver_section_title.height() + 50
+        self.driver_informations_section1.move(
+            0,
+            self.driver_registration_title.y()
+            + self.driver_registration_title.height()
+            + 55,
         )
 
-        input_fullname = QtWidgets.QLineEdit(parent=driver_informations_section)
-        input_fullname.setStyleSheet(css.registration_input_focused)
-        input_fullname.setFixedSize(inputs_width, inputs_height)
-        input_fullname.setMaxLength(100)
-        input_fullname.move(
+        self.lbl_fullname = QtWidgets.QLabel(
+            "Nome completo:", parent=self.driver_informations_section1
+        )
+        self.lbl_fullname.setStyleSheet(css.registration_label_guide)
+        self.lbl_fullname.move(margin_left, 0)
+
+        self.input_fullname = QtWidgets.QLineEdit(
+            parent=self.driver_informations_section1
+        )
+        self.input_fullname.setStyleSheet(css.registration_input_focused)
+        self.input_fullname.setFixedSize(inputs_width, inputs_height)
+        self.input_fullname.setMaxLength(100)
+        self.input_fullname.move(
             margin_left,
-            lbl_fullname.y() + lbl_fullname.height() + space_between_elements,
+            self.lbl_fullname.y() + self.lbl_fullname.height() + space_between_elements,
         )
 
-        lbl_cpf = QtWidgets.QLabel("CPF:", parent=driver_informations_section)
-        lbl_cpf.setStyleSheet(css.registration_label_guide)
-        lbl_cpf.move(
+        self.lbl_cpf = QtWidgets.QLabel(
+            "CPF:", parent=self.driver_informations_section1
+        )
+        self.lbl_cpf.setStyleSheet(css.registration_label_guide)
+        self.lbl_cpf.move(
             margin_left,
-            input_fullname.y() + inputs_height + (space_between_elements * 6),
+            self.input_fullname.y() + inputs_height + (space_between_elements * 6),
         )
 
-        input_cpf = QtWidgets.QLineEdit(parent=driver_informations_section)
-        input_cpf.setStyleSheet(css.registration_input_focused)
-        input_cpf.setFixedSize(inputs_width, inputs_height)
-        input_cpf.setMaxLength(14)
-        input_cpf.move(
+        self.input_cpf = QtWidgets.QLineEdit(parent=self.driver_informations_section1)
+        self.input_cpf.setStyleSheet(css.registration_input_focused)
+        self.input_cpf.setFixedSize(inputs_width, inputs_height)
+        self.input_cpf.setMaxLength(14)
+        self.input_cpf.move(
             margin_left,
-            lbl_cpf.y() + lbl_cpf.height() + space_between_elements
+            self.lbl_cpf.y() + self.lbl_cpf.height() + space_between_elements,
         )
 
-        lbl_birth_date = QtWidgets.QLabel("Data de nascimento:", parent=driver_informations_section)
-        lbl_birth_date.setStyleSheet(css.registration_label_guide)
-        lbl_birth_date.move(
+        self.lbl_birth_date = QtWidgets.QLabel(
+            "Data de nascimento:", parent=self.driver_informations_section1
+        )
+        self.lbl_birth_date.setStyleSheet(css.registration_label_guide)
+        self.lbl_birth_date.move(
             margin_left,
-            input_cpf.y() + inputs_height + (space_between_elements * 6),
+            self.input_cpf.y() + inputs_height + (space_between_elements * 6),
         )
 
-        input_birth_date = QtWidgets.QDateEdit(parent=driver_informations_section)
-        input_birth_date.setStyleSheet(css.registration_input_focused)
-        input_birth_date.setFixedSize(inputs_width, inputs_height)
-        input_birth_date.move(
+        self.input_birth_date = QtWidgets.QDateEdit(
+            parent=self.driver_informations_section1
+        )
+        self.input_birth_date.setStyleSheet(css.registration_input_focused)
+        self.input_birth_date.setFixedSize(inputs_width, inputs_height)
+        self.input_birth_date.move(
             margin_left,
-            lbl_birth_date.y() + lbl_birth_date.height() + space_between_elements
+            self.lbl_birth_date.y()
+            + self.lbl_birth_date.height()
+            + space_between_elements,
         )
 
         # Yes, I know it would be better to separate the adress into street, number and neighborhood
         # This is just a simple project to show my abilities
-        lbl_address = QtWidgets.QLabel("Endereço:", parent=driver_informations_section)
-        lbl_address.setStyleSheet(css.registration_label_guide)
-        lbl_address.move(
+        self.lbl_address = QtWidgets.QLabel(
+            "Endereço:", parent=self.driver_informations_section1
+        )
+        self.lbl_address.setStyleSheet(css.registration_label_guide)
+        self.lbl_address.move(
             margin_left,
-            input_birth_date.y() + inputs_height + (space_between_elements * 6),
+            self.input_birth_date.y() + inputs_height + (space_between_elements * 6),
         )
 
-        input_address = QtWidgets.QLineEdit(parent=driver_informations_section)
-        input_address.setStyleSheet(css.registration_input_focused)
-        input_address.setFixedSize(inputs_width, inputs_height)
-        input_address.setMaxLength(150)
-        input_address.move(
+        self.input_address = QtWidgets.QLineEdit(
+            parent=self.driver_informations_section1
+        )
+        self.input_address.setStyleSheet(css.registration_input_focused)
+        self.input_address.setFixedSize(inputs_width, inputs_height)
+        self.input_address.setMaxLength(150)
+        self.input_address.move(
             margin_left,
-            lbl_address.y() + lbl_address.height() + space_between_elements
+            self.lbl_address.y() + self.lbl_address.height() + space_between_elements,
         )
 
-        lbl_phone = QtWidgets.QLabel("Telefone:", parent=driver_informations_section)
-        lbl_phone.setStyleSheet(css.registration_label_guide)
-        lbl_phone.move(
+        self.lbl_phone = QtWidgets.QLabel(
+            "Telefone:", parent=self.driver_informations_section1
+        )
+        self.lbl_phone.setStyleSheet(css.registration_label_guide)
+        self.lbl_phone.move(
             margin_left,
-            input_address.y() + inputs_height + (space_between_elements * 6),
+            self.input_address.y() + inputs_height + (space_between_elements * 6),
         )
 
-        input_ddd = QtWidgets.QLineEdit("DDD",parent=driver_informations_section)
-        input_ddd.setStyleSheet(css.registration_input)
-        input_ddd.setFixedSize(70, inputs_height)
-        input_ddd.setMaxLength(3)
-        input_ddd.move(
-            margin_left,
-            lbl_phone.y() + lbl_phone.height() + space_between_elements
+        self.input_ddd = QtWidgets.QLineEdit(
+            "DDD", parent=self.driver_informations_section1
         )
-        input_ddd.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
+        self.input_ddd.setStyleSheet(css.registration_input)
+        self.input_ddd.setFixedSize(70, inputs_height)
+        self.input_ddd.setMaxLength(3)
+        self.input_ddd.move(
+            margin_left,
+            self.lbl_phone.y() + self.lbl_phone.height() + space_between_elements,
+        )
+        self.input_ddd.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
 
         # Quando pressionado, um widget chama automaticamente o metodo interno mousePressEvent(event), passando
         # o evento ocorrido como argumento. O que eu estou fazendo aqui é basicamente sobrescrever o metodo
         # mousePressEvent original, atribuindo a esse identificador uma nova função.
-        input_ddd.mousePressEvent = lambda event: self.input_toggle_placeholder(input_ddd, "DDD")
-        input_ddd.focusOutEvent = lambda event: self.input_toggle_placeholder(input_ddd, "DDD")
-
-        input_number = QtWidgets.QLineEdit(parent=driver_informations_section)
-        input_number.setStyleSheet(css.registration_input_focused)
-        input_number.setFixedSize(inputs_width - margin_left - input_ddd.width(), inputs_height)
-        input_number.setMaxLength(9)
-        input_number.move(
-            (margin_left*2) + input_ddd.width(),
-            lbl_phone.y() + lbl_phone.height() + space_between_elements
+        self.input_ddd.mousePressEvent = lambda event: self.remove_placeholder(
+            self.input_ddd, "DDD"
+        )
+        self.input_ddd.focusOutEvent = lambda event: self.add_placeholder_if_needed(
+            self.input_ddd, "DDD"
         )
 
-    def input_toggle_placeholder(self, target_input, placeholder):
+        self.input_number = QtWidgets.QLineEdit(
+            parent=self.driver_informations_section1
+        )
+        self.input_number.setStyleSheet(css.registration_input_focused)
+        self.input_number.setFixedSize(
+            inputs_width - margin_left - self.input_ddd.width(), inputs_height
+        )
+        self.input_number.setMaxLength(9)
+        self.input_number.move(
+            (margin_left * 2) + self.input_ddd.width(),
+            self.lbl_phone.y() + self.lbl_phone.height() + space_between_elements,
+        )
+
+        self.next_page_driver_button = QtWidgets.QPushButton("Next page >", parent=self)
+        self.next_page_driver_button.setFixedSize(100, 40)
+        self.next_page_driver_button.move(
+            self.width() - margin_left - self.next_page_driver_button.width(),
+            self.height() - self.next_page_driver_button.height() * 2.5,
+        )
+        self.next_page_driver_button.state = "deactivated"
+        self.next_page_driver_button.clicked.connect(self.next_drivers_page)
+
+    def remove_placeholder(self, target_input, placeholder):
+        target_input.setReadOnly(False)
+
         if target_input.text() == placeholder:
-            target_input.setText("")
-            target_input.setReadOnly(False)
             target_input.setStyleSheet(css.registration_input_focused)
-        else:
-            target_input.setText(placeholder)
-            target_input.setReadOnly(True)
+            target_input.setText("")
+
+    def add_placeholder_if_needed(self, target_input, placeholder):
+        if target_input.text() == "":
             target_input.setStyleSheet(css.registration_input)
+            target_input.setText(placeholder)
+
+        target_input.setReadOnly(True)
+
+    def next_drivers_page(self):
+        if self.next_page_driver_button.state == "deactivated":
+            self.next_page_driver_button.state = "activated"
+            self.driver_informations_section1.setVisible(False)
+            self.next_page_driver_button.setText("< Last page")
+        else:
+            self.next_page_driver_button.state = "deactivated"
+            self.next_page_driver_button.setText("Next page >")
+            self.driver_informations_section1.setVisible(True)
 
 
 connection.close()

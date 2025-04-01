@@ -16,7 +16,7 @@ registration_title = """
 """
 
 registration_label_guide = """
-    font-size: 18px;
+    font-size: 15px;
 """
 
 registration_input = """
@@ -33,4 +33,5 @@ registration_input_focused = """
 """
 
 driver_informations_section = """
+    
 """
