@@ -1,8 +1,12 @@
 import sqlite3
 
+
 class Driver:
     """this class instanciates new drivers that will be added to the database"""
-    def __init__(self, full_name, cpf, birth_date, address, phone, email, password, cnh):
+
+    def __init__(
+        self, full_name, cpf, birth_date, address, phone, email, password, cnh
+    ):
         self.full_name = full_name
         self.cpf = cpf
         self.birth_date = birth_date
@@ -11,6 +15,21 @@ class Driver:
         self.email = email
         self.password = password
         self.cnh = cnh
+
+    def __repr__(self):
+        repr = f"""
+        Nome: {self.full_name}
+        CPF: {self.cpf}
+        BIRTH DATE: {self.birth_date}
+        ADDRESS: {self.address}
+        PHONE: {self.phone}
+        EMAIL: {self.email}
+        PASSWORD: {self.password}
+        CNH: {self.cnh}
+
+        """
+        return repr
+
 
 def create_table_drivers(connection: sqlite3.Connection):
     cursor = connection.cursor()
@@ -75,5 +94,3 @@ def register_new_driver(connection: sqlite3.Connection, driver: Driver):
 
     connection.commit()
     cursor.close()
-
-
