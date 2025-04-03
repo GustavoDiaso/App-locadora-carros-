@@ -440,6 +440,7 @@ class RegistrationForms(QtWidgets.QLabel):
             self.input_number.text() != "",
             self.input_password_first.text() != "",
             self.input_password_second.text() != "",
+            self.input_password_second.text() != "Confirme sua senha",
         ]
 
         return True if all(conditions) else False
@@ -476,7 +477,9 @@ class RegistrationForms(QtWidgets.QLabel):
             )
             self.lbl_pwrd_dont_match.setVisible(False)
 
-            print(driver)
+            # Vamos tentar fazer o cadastro do motorista no banco de dados:
+            psq.register_new_driver(connection=connection, driver=driver)
+
         else:
             if nothing_empty is False:
                 print("Todas as informações devem ser preenchidas!")

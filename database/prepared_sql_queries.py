@@ -1,5 +1,5 @@
 import sqlite3
-
+from dotenv import load_dotenv
 
 class Driver:
     """this class instanciates new drivers that will be added to the database"""
@@ -35,7 +35,7 @@ def create_table_drivers(connection: sqlite3.Connection):
     cursor = connection.cursor()
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS drivers (
+        CREATE TABLE IF NOT EXISTS motoristas (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             full_name TEXT NOT NULL,
             cpf TEXT UNIQUE NOT NULL,
@@ -86,11 +86,37 @@ def register_new_driver(connection: sqlite3.Connection, driver: Driver):
     cursor = connection.cursor()
 
     # first check if the email is already being used
-    cursor.execute(
-        """
-        
-        """
-    )
+    users_with_same_email = cursor.execute(
+        "SELECT COUNT(*) FROM motoristas WHERE email=?", [driver.email]
+    ).fetchone()
 
-    connection.commit()
+    if users_with_same_email[0] == 0:
+        cursor.execute(
+            """
+                INSERT INTO motoristas (
+                    full_name, 
+                    cpf,
+                    birth_date,
+                    address ,
+                    phone_number,
+                    email ,
+                    password ,
+                    cnh_number
+                ) VALUES (?,?,?,?,?,?,?,?)
+            """,
+            [
+                driver.full_name,
+                driver.cpf,
+                driver.birth_date,
+                driver.address,
+                driver.phone,
+                driver.email,
+                driver.password,
+                driver.cnh
+            ]
+        )
+
+        connection.commit()
+    else:
+        print('Email já cadastrado')
     cursor.close()
