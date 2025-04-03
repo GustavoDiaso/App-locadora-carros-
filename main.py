@@ -347,7 +347,9 @@ class RegistrationForms(QtWidgets.QLabel):
             - self.btn_register_driver.width() // 2,
             self.input_password_second.y() + inputs_height + space_between_elements * 6,
         )
-        self.btn_register_driver.clicked.connect(lambda: self.get_driver_data())
+        self.btn_register_driver.clicked.connect(
+            lambda: self.save_driver_informations()
+        )
 
         self.driver_informations_section1.raise_()
 
@@ -427,6 +429,17 @@ class RegistrationForms(QtWidgets.QLabel):
 
         return False
 
+    def check_valid_cpf(self):
+        cpf = self.input_cpf.text()
+        sum = 0
+        for num in cpf:
+            sum += int(num)
+
+        if len(cpf) != 11 or str(sum)[0] != str(sum)[1]:
+            return False
+
+        return True
+
     def all_data_provided(self):
         conditions = [
             self.input_address.text() != "",
@@ -445,11 +458,12 @@ class RegistrationForms(QtWidgets.QLabel):
 
         return True if all(conditions) else False
 
-    def get_driver_data(self):
+    def save_driver_informations(self):
         special_conditions = [
             self.check_matching_passwords(),
             self.check_valid_email(),
             self.check_valid_phone_number(),
+            self.check_valid_cpf(),
         ]
         nothing_empty = self.all_data_provided()
 
@@ -481,22 +495,28 @@ class RegistrationForms(QtWidgets.QLabel):
             psq.register_new_driver(connection=connection, driver=driver)
 
         else:
-            if nothing_empty is False:
-                print("Todas as informações devem ser preenchidas!")
+            if nothing_empty:
+                for condition, evaluation in enumerate(special_conditions):
+                    if evaluation is False:
+                        match condition:
+                            case 0:
+                                print("Senhas não combinam")
+                                self.lbl_pwrd_dont_match.setVisible(True)
+                            case 1:
+                                print("Email inválido")
+                            case 3:
+                                print("Telefone inválido")
+                            case 4:
+                                print("CPF inválido")
 
-            elif special_conditions[0] is False:
-                print("Senha inválida")
-                self.lbl_pwrd_dont_match.setVisible(True)
-            elif special_conditions[1] is False:
-                print("Email inválido")
             else:
-                print("Telefone inválido")
+                print("Você precisa preencher todos os campos!!")
 
-
-connection.close()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication()
     main_window = MainWindow()
     main_window.showMaximized()
     app.exec()
+    psq.clear_table(connection=connection, table_name="motoristas")
+    connection.close()

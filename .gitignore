@@ -9,6 +9,7 @@ testes_aleatórios
 docker-compose.yml
 database/database_info.env
 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

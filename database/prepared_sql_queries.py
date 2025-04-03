@@ -1,6 +1,7 @@
 import sqlite3
 from dotenv import load_dotenv
 
+
 class Driver:
     """this class instanciates new drivers that will be added to the database"""
 
@@ -91,6 +92,7 @@ def register_new_driver(connection: sqlite3.Connection, driver: Driver):
     ).fetchone()
 
     if users_with_same_email[0] == 0:
+        print("Validas informações")
         cursor.execute(
             """
                 INSERT INTO motoristas (
@@ -112,11 +114,34 @@ def register_new_driver(connection: sqlite3.Connection, driver: Driver):
                 driver.phone,
                 driver.email,
                 driver.password,
-                driver.cnh
-            ]
+                driver.cnh,
+            ],
         )
 
         connection.commit()
     else:
-        print('Email já cadastrado')
+        print("Email já cadastrado")
+
+    cursor.close()
+
+
+def clear_table(connection: sqlite3.Connection, table_name: str):
+    cursor = connection.cursor()
+
+    # limpa a tabela inteira
+    cursor.execute(
+        f"""
+        DELETE FROM {table_name}
+        """
+    )
+
+    # Reindexa as linhas de forma crescente
+    cursor.execute(
+        f"""
+        DELETE FROM sqlite_sequence WHERE name="{table_name}"
+        """
+    )
+
+    connection.commit()
+
     cursor.close()
