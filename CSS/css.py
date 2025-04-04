@@ -35,3 +35,7 @@ registration_input_focused = """
 driver_informations_section = """
     
 """
+
+informative_popup = """
+    background-color: blue;
+"""

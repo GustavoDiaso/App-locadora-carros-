@@ -1,5 +1,8 @@
 import sqlite3
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
+from pathlib import Path
+
+env_variables = dotenv_values(Path(__file__).parent / "database_info.env")
 
 
 class Driver:
@@ -35,8 +38,8 @@ class Driver:
 def create_table_drivers(connection: sqlite3.Connection):
     cursor = connection.cursor()
     cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS motoristas (
+        f"""
+        CREATE TABLE IF NOT EXISTS {env_variables['DRIVERS_TABLE_NAME']} (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             full_name TEXT NOT NULL,
             cpf TEXT UNIQUE NOT NULL,
@@ -56,7 +59,16 @@ def create_table_drivers(connection: sqlite3.Connection):
 def drop_table_drivers(connection: sqlite3.Connection):
     cursor = connection.cursor()
 
-    cursor.execute("DROP TABLE drivers")
+    cursor.execute(f"DROP TABLE {env_variables['DRIVERS_TABLE_NAME']}")
+
+    connection.commit()
+    cursor.close()
+
+
+def drop_table_vehicles(connection: sqlite3.Connection):
+    cursor = connection.cursor()
+
+    cursor.execute(f"DROP TABLE {env_variables['VEHICLES_TABLE_NAME']}")
 
     connection.commit()
     cursor.close()
@@ -65,8 +77,8 @@ def drop_table_drivers(connection: sqlite3.Connection):
 def create_table_vehicles(connection: sqlite3.Connection):
     cursor = connection.cursor()
     cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS veiculos (
+        f"""
+        CREATE TABLE IF NOT EXISTS {env_variables['VEHICLES_TABLE_NAME']} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             id_proprietario INTEGER,
             crv TEXT NOT NULL,
@@ -83,19 +95,39 @@ def create_table_vehicles(connection: sqlite3.Connection):
     cursor.close()
 
 
-def register_new_driver(connection: sqlite3.Connection, driver: Driver):
-    cursor = connection.cursor()
+def register_new_driver(
+    connection: sqlite3.Connection, driver: Driver
+) -> list[bool, str]:
 
-    # first check if the email is already being used
+    cursor = connection.cursor()
+    # cheque se o email do motorista já está em uso
     users_with_same_email = cursor.execute(
-        "SELECT COUNT(*) FROM motoristas WHERE email=?", [driver.email]
+        f"SELECT COUNT(*) FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE email=?",
+        [driver.email],
     ).fetchone()
 
-    if users_with_same_email[0] == 0:
-        print("Validas informações")
+    # cheque se o cpf do motorista já está em uso:
+    users_with_same_cpf = cursor.execute(
+        f"SELECT COUNT(*) FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE cpf=?",
+        [driver.cpf],
+    ).fetchone()
+
+    # cheque se a cnh do motorista já está em uso:
+    users_with_same_cnh = cursor.execute(
+        f"SELECT COUNT(*) FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE cnh_number=?",
+        [driver.cnh],
+    ).fetchone()
+
+    conditions = [
+        users_with_same_email[0] == 0,
+        users_with_same_cpf[0] == 0,
+        users_with_same_cnh[0] == 0,
+    ]
+
+    if all(conditions):
         cursor.execute(
-            """
-                INSERT INTO motoristas (
+            f"""
+                INSERT INTO {env_variables['DRIVERS_TABLE_NAME']} (
                     full_name, 
                     cpf,
                     birth_date,
@@ -119,10 +151,34 @@ def register_new_driver(connection: sqlite3.Connection, driver: Driver):
         )
 
         connection.commit()
-    else:
-        print("Email já cadastrado")
 
-    cursor.close()
+        register_confirmation = cursor.execute(
+            f"""
+            SELECT COUNT(*) FROM {env_variables['DRIVERS_TABLE_NAME']} 
+            WHERE cpf = ? and cnh_number = ?""",
+            [driver.cpf, driver.cnh],
+        ).fetchone()
+
+        cursor.close()
+
+        return (
+            [True, "Motorista cadastrado com sucesso."]
+            if register_confirmation[0] == 1
+            else [False, "Algo deu errado"]
+        )
+
+    else:
+        cursor.close()
+
+        for condition, evaluation in enumerate(conditions):
+            if evaluation is False:
+                match condition:
+                    case 0:
+                        return [False, "Esse endereço de email já está em uso"]
+                    case 1:
+                        return [False, "CPF já cadastrado"]
+                    case 2:
+                        return [False, "CNH já cadastrada"]
 
 
 def clear_table(connection: sqlite3.Connection, table_name: str):

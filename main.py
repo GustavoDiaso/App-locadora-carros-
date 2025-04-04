@@ -22,7 +22,8 @@ class MainWindow(QtWidgets.QWidget):
         user_screen_geometry = user_screen.availableGeometry()
         self.setMinimumSize(user_screen_geometry.width(), user_screen_geometry.height())
 
-        registration_forms = RegistrationForms(parent=self)
+        self.registration_forms = RegistrationForms(parent=self)
+        self.informative_popup = InformativePopUp(parent=self)
 
 
 class RegistrationForms(QtWidgets.QLabel):
@@ -204,15 +205,6 @@ class RegistrationForms(QtWidgets.QLabel):
             event, self.input_number, "999999999"
         )
 
-        self.next_page_driver_button = QtWidgets.QPushButton("Next page >", parent=self)
-        self.next_page_driver_button.setFixedSize(100, 40)
-        self.next_page_driver_button.move(
-            self.width() - margin_left - self.next_page_driver_button.width(),
-            self.height() - self.next_page_driver_button.height() * 3,
-        )
-        self.next_page_driver_button.state = "deactivated"
-        self.next_page_driver_button.clicked.connect(self.next_drivers_page)
-
         self.driver_informations_section2 = QtWidgets.QLabel(parent=self)
         self.driver_informations_section2.setStyleSheet(css.driver_informations_section)
         self.driver_informations_section2.setFixedSize(
@@ -341,7 +333,7 @@ class RegistrationForms(QtWidgets.QLabel):
         self.btn_register_driver = QtWidgets.QPushButton(
             "Cadastrar", parent=self.driver_informations_section2
         )
-        self.btn_register_driver.setFixedSize(120, 60)
+        self.btn_register_driver.setFixedSize(120, 50)
         self.btn_register_driver.move(
             self.driver_informations_section2.width() // 2
             - self.btn_register_driver.width() // 2,
@@ -351,7 +343,23 @@ class RegistrationForms(QtWidgets.QLabel):
             lambda: self.save_driver_informations()
         )
 
+        # Esse comando faz com que a seção 1 da tela de cadastro de motoristas apareça antes
+        # da seção 2.
         self.driver_informations_section1.raise_()
+
+        # Criando um botão para navegar entre as páginas do formulário de cadastro de motoristas
+        self.btn_next_stage_driver_info = QtWidgets.QPushButton(
+            "Next page >", parent=self
+        )
+        self.btn_next_stage_driver_info.setFixedSize(100, 40)
+        self.btn_next_stage_driver_info.move(
+            self.width() - margin_left - self.btn_next_stage_driver_info.width(),
+            self.driver_informations_section1.y()
+            + self.driver_informations_section1.height()
+            + 35,
+        )
+        self.btn_next_stage_driver_info.state = "deactivated"
+        self.btn_next_stage_driver_info.clicked.connect(self.next_drivers_page)
 
     # Daqui para frente estão os métodos (slots) que serão executados na disparada de eventos pelos obj da UX/UI
     def toggle_placeholder(self, event, target_input, placeholder=""):
@@ -372,18 +380,20 @@ class RegistrationForms(QtWidgets.QLabel):
                 target_input.setReadOnly(True)
 
     def next_drivers_page(self):
-        if self.next_page_driver_button.state == "deactivated":
-            self.next_page_driver_button.state = "activated"
+        if self.btn_next_stage_driver_info.state == "deactivated":
+            self.btn_next_stage_driver_info.state = "activated"
             self.driver_informations_section1.setVisible(False)
             self.driver_informations_section2.setVisible(True)
-            self.next_page_driver_button.setText("< Last page")
+            self.btn_next_stage_driver_info.setText("< Last page")
             self.driver_informations_section2.raise_()
+            self.btn_next_stage_driver_info.raise_()
         else:
-            self.next_page_driver_button.state = "deactivated"
-            self.next_page_driver_button.setText("Next page >")
+            self.btn_next_stage_driver_info.state = "deactivated"
+            self.btn_next_stage_driver_info.setText("Next page >")
             self.driver_informations_section1.setVisible(True)
             self.driver_informations_section2.setVisible(False)
             self.driver_informations_section1.raise_()
+            self.btn_next_stage_driver_info.raise_()
 
     def enter_password_mode(self, target_input: QtWidgets.QLineEdit):
         if target_input.echoMode() == QtWidgets.QLineEdit.EchoMode.Normal:
@@ -447,16 +457,29 @@ class RegistrationForms(QtWidgets.QLabel):
             self.input_birth_date.text() != "",
             self.input_cnh.text() != "",
             self.input_fullname.text() != "",
-            self.input_ddd.text() != "ddd",
+            self.input_ddd.text() != "DDD",
             self.input_ddd.text() != "",
             self.input_number.text() != "999999999",
             self.input_number.text() != "",
+            self.input_email.text() != "",
             self.input_password_first.text() != "",
             self.input_password_second.text() != "",
             self.input_password_second.text() != "Confirme sua senha",
         ]
 
         return True if all(conditions) else False
+
+    def clear_driver_forms_inputs(self):
+        self.input_address.setText("")
+        self.input_cpf.setText("")
+        self.input_birth_date.setDate(QtCore.QDate.currentDate())
+        self.input_email.setText("")
+        self.input_cnh.setText("")
+        self.input_fullname.setText("")
+        self.input_ddd.setText("DDD")
+        self.input_number.setText("999999999")
+        self.input_password_first.setText("")
+        self.input_password_second.setText("")
 
     def save_driver_informations(self):
         special_conditions = [
@@ -492,7 +515,18 @@ class RegistrationForms(QtWidgets.QLabel):
             self.lbl_pwrd_dont_match.setVisible(False)
 
             # Vamos tentar fazer o cadastro do motorista no banco de dados:
-            psq.register_new_driver(connection=connection, driver=driver)
+            registration_status = psq.register_new_driver(
+                connection=connection, driver=driver
+            )
+
+            # Caso o motorista tenha sido cadastrado com sucesso...
+            if registration_status[0] is True:
+                self.clear_driver_forms_inputs()
+            else:
+                # Analisando os possíveis erros que possam ter ocorrido
+                match registration_status[1]:
+                    case "Esse endereço de email já está em uso":
+                        ...
 
         else:
             if nothing_empty:
@@ -510,7 +544,45 @@ class RegistrationForms(QtWidgets.QLabel):
                                 print("CPF inválido")
 
             else:
-                print("Você precisa preencher todos os campos!!")
+                main_window: MainWindow = self.parent()
+                informative_popup: InformativePopUp = main_window.informative_popup
+
+                informative_popup.lbl_information.setText(
+                    "Todos os campos devem ser preenchidos"
+                )
+                informative_popup.setVisible(True)
+
+
+class InformativePopUp(QtWidgets.QLabel):
+    def __init__(self, parent: MainWindow, information: str = ""):
+        super(InformativePopUp, self).__init__(parent=parent)
+        self.setFixedSize(500, 500)
+        self.move(
+            parent.width() // 2 - self.width() // 2,
+            parent.height() // 2 - self.height() // 2,
+        )
+        self.setStyleSheet(css.informative_popup)
+
+        margin_right = 30
+        margin_left = 30
+
+        self.btn_close_popup = QtWidgets.QPushButton("X", parent=self)
+        self.btn_close_popup.setFixedSize(30, 30)
+        self.btn_close_popup.move(
+            self.width() - self.btn_close_popup.width() - margin_right, 10
+        )
+        self.btn_close_popup.clicked.connect(self.toggle_popup)
+
+        self.lbl_information = QtWidgets.QLabel(information, parent=self)
+        self.lbl_information.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.setVisible(True)
+
+    def toggle_popup(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
 
 
 if __name__ == "__main__":
@@ -518,5 +590,5 @@ if __name__ == "__main__":
     main_window = MainWindow()
     main_window.showMaximized()
     app.exec()
-    psq.clear_table(connection=connection, table_name="motoristas")
+    psq.clear_table(connection=connection, table_name="drivers")
     connection.close()
