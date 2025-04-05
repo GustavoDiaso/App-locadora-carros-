@@ -37,5 +37,31 @@ driver_informations_section = """
 """
 
 informative_popup = """
-    background-color: blue;
+    background-color: white;
+    border: 2px solid #dbdbdb;
+    border-radius: 15px;
+    color: black;
+"""
+popup_header = """
+    background-color: #303030;
+    border-bottom: none;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    font-size: 14px;
+    color: white;
+"""
+
+informative_popup_lbl = """
+    border: none;
+    color: black;
+    font-size: 15px;
+"""
+
+btn_close_popup = """
+    border: none;
+    border-radius: 10px;
+    background-color: #dd1533;
+    color: #6b0002;
+    font-size: 12px;
+    font-weight: bold;
 """
