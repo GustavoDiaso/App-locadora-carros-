@@ -490,6 +490,9 @@ class RegistrationForms(QtWidgets.QLabel):
         ]
         nothing_empty = self.all_data_provided()
 
+        main_window: MainWindow = self.parent()
+        informative_popup: InformativePopUp = main_window.informative_popup
+
         # Se todas as condições especiais forem satisfeitas e todos os dados tiverem
         # sido fornecidos...
         if all(special_conditions) and nothing_empty:
@@ -515,39 +518,43 @@ class RegistrationForms(QtWidgets.QLabel):
             self.lbl_pwrd_dont_match.setVisible(False)
 
             # Vamos tentar fazer o cadastro do motorista no banco de dados:
-            registration_status = psq.register_new_driver(
+            driver_registration_status = psq.register_new_driver(
                 connection=connection, driver=driver
             )
 
             # Caso o motorista tenha sido cadastrado com sucesso...
-            if registration_status[0] is True:
+            if driver_registration_status[0] is True:
                 self.clear_driver_forms_inputs()
+                informative_popup.popup_header.setText("Operação bem-sucedida")
             else:
-                # Analisando os possíveis erros que possam ter ocorrido
-                match registration_status[1]:
-                    case "Esse endereço de email já está em uso":
-                        ...
+                informative_popup.popup_header.setText("Operação malsucedida")
+
+            informative_popup.lbl_information.setText(driver_registration_status[1])
+            informative_popup.setVisible(True)
 
         else:
             if nothing_empty:
+
+                error_message = ""
+
                 for condition, evaluation in enumerate(special_conditions):
                     if evaluation is False:
                         match condition:
                             case 0:
-                                print("Senhas não combinam")
+                                error_message = "Senhas não combinam"
                                 self.lbl_pwrd_dont_match.setVisible(True)
                             case 1:
-                                print("Email inválido")
+                                error_message = "Email inválido"
+                            case 2:
+                                error_message = "Telefone inválido"
                             case 3:
-                                print("Telefone inválido")
-                            case 4:
-                                print("CPF inválido")
-
-            else:
-                main_window: MainWindow = self.parent()
-                informative_popup: InformativePopUp = main_window.informative_popup
+                                error_message = "CPF inválido"
 
                 informative_popup.popup_header.setText("Operação malsucedida")
+                informative_popup.lbl_information.setText(error_message)
+                informative_popup.setVisible(True)
+
+            else:
                 informative_popup.lbl_information.setText(
                     "Todos os campos devem ser preenchidos!"
                 )
