@@ -22,13 +22,17 @@ class MainWindow(QtWidgets.QWidget):
         user_screen_geometry = user_screen.availableGeometry()
         self.setMinimumSize(user_screen_geometry.width(), user_screen_geometry.height())
 
-        self.registration_forms = RegistrationForms(parent=self)
+        self.login_or_register_window = LoginOrRegisterSideMenu(parent=self)
+
+        self.driver_registration_form = DriverRegistrationForm(parent=self)
+
         self.informative_popup = InformativePopUp(parent=self)
 
 
-class RegistrationForms(QtWidgets.QLabel):
+class DriverRegistrationForm(QtWidgets.QLabel):
     def __init__(self, parent: MainWindow):
-        super(RegistrationForms, self).__init__(parent=parent)
+        super(DriverRegistrationForm, self).__init__(parent=parent)
+        self.setVisible(False)
         self.setStyleSheet(css.registration_forms)
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
@@ -522,14 +526,14 @@ class RegistrationForms(QtWidgets.QLabel):
                 connection=connection, driver=driver
             )
 
+            informative_popup.popup_header.setText("Operação malsucedida")
+            informative_popup.lbl_information.setText(driver_registration_status[1])
+
             # Caso o motorista tenha sido cadastrado com sucesso...
             if driver_registration_status[0] is True:
                 self.clear_driver_forms_inputs()
                 informative_popup.popup_header.setText("Operação bem-sucedida")
-            else:
-                informative_popup.popup_header.setText("Operação malsucedida")
 
-            informative_popup.lbl_information.setText(driver_registration_status[1])
             informative_popup.setVisible(True)
 
         else:
@@ -555,6 +559,7 @@ class RegistrationForms(QtWidgets.QLabel):
                 informative_popup.setVisible(True)
 
             else:
+                informative_popup.popup_header.setText("Operação malsucedida")
                 informative_popup.lbl_information.setText(
                     "Todos os campos devem ser preenchidos!"
                 )
@@ -604,13 +609,90 @@ class InformativePopUp(QtWidgets.QLabel):
         )
         self.lbl_information.setStyleSheet(css.informative_popup_lbl)
 
-        self.setVisible(True)
+        self.setVisible(False)
 
     def toggle_popup(self):
         if self.isVisible():
             self.hide()
         else:
             self.show()
+
+
+class LoginOrRegisterSideMenu(QtWidgets.QLabel):
+    def __init__(self, parent: MainWindow):
+        super(LoginOrRegisterSideMenu, self).__init__(parent=parent)
+        self.setStyleSheet(css.registration_forms)
+
+        user_screen = QtGui.QGuiApplication.primaryScreen()
+        user_screen_geometry = user_screen.availableGeometry()
+        self.setFixedSize(
+            user_screen_geometry.width() * 2 / 5, user_screen_geometry.height()
+        )
+
+        self.move(0, 0)
+
+        space_between_the_buttons = 10
+        buttons_height = 60
+        buttons_width = 120
+
+        self.welcome_title = QtWidgets.QLabel(
+            "Seja bem-vindo", parent=self
+        )
+        self.welcome_title.setFixedWidth(len(self.welcome_title.text())*18)
+        self.welcome_title.setStyleSheet(css.registration_title)
+        self.welcome_title.move(
+            self.width() // 2 - self.welcome_title.width() // 2,
+            self.height()//2 - buttons_height // 2 - self.welcome_title.height() - 60
+        )
+
+        self.login_or_register_div = QtWidgets.QLabel(parent=self)
+        self.login_or_register_div.setFixedSize(
+            self.width(),
+            buttons_height
+        )
+        self.login_or_register_div.move(
+            0,
+            self.height()//2 - self.login_or_register_div.height()//2
+        )
+
+        self.btn_login = QtWidgets.QPushButton("Fazer login",parent=self.login_or_register_div)
+        self.btn_login.setStyleSheet(css.login_and_register_buttons)
+        self.btn_login.setFixedSize(buttons_width, buttons_height)
+        self.btn_login.move(
+            self.width() // 2 - buttons_width - space_between_the_buttons,
+            0
+        )
+        self.btn_login.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_login.highlighted = False
+        self.btn_login.enterEvent = lambda event: self.emphasize_button(self.btn_login)
+        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(self.btn_login)
+
+        self.btn_register = QtWidgets.QPushButton("Cadastrar-se", parent=self.login_or_register_div)
+        self.btn_register.setStyleSheet(css.login_and_register_buttons)
+        self.btn_register.setFixedSize(buttons_width, buttons_height)
+        self.btn_register.move(
+            self.width() // 2 + space_between_the_buttons,
+            0
+        )
+        self.btn_register.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_register.highlighted = False
+        self.btn_register.enterEvent = lambda event: self.emphasize_button(self.btn_register)
+        self.btn_register.leaveEvent = lambda event: self.deemphasize_button(self.btn_register)
+
+    def emphasize_button(self, button: QtWidgets.QPushButton):
+        if not button.highlighted:
+            button.highlighted = True
+            button.setStyleSheet(css.login_and_register_buttons_highlighted)
+
+    def deemphasize_button(self, button: QtWidgets.QPushButton):
+        if button.highlighted:
+            button.highlighted = False
+            button.setStyleSheet(css.login_and_register_buttons)
+
+
+
+
+
 
 
 if __name__ == "__main__":

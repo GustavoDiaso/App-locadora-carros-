@@ -80,14 +80,15 @@ def create_table_vehicles(connection: sqlite3.Connection):
         f"""
         CREATE TABLE IF NOT EXISTS {env_variables['VEHICLES_TABLE_NAME']} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_proprietario INTEGER,
+            id_owner INTEGER,
             crv TEXT NOT NULL,
-            numero_do_chassi TEXT UNIQUE NOT NULL,
-            ano_de_fabricacao INTEGER NOT NULL,
-            modelo TEXT NOT NULL,
-            cor TEXT NOT NULL,
-            categoria_do_veiculo TEXT NOT NULL,
-            FOREIGN KEY (id_proprietario) REFERENCES drivers(id)
+            chassi_number TEXT UNIQUE NOT NULL,
+            year of manufacture INTEGER NOT NULL,
+            model TEXT NOT NULL,
+            color TEXT NOT NULL,
+            vehicle_category TEXT NOT NULL,
+            plate TEXT NOT NULL,
+            FOREIGN KEY (id_owner) REFERENCES drivers(id)
         );
         """
     )
@@ -97,7 +98,7 @@ def create_table_vehicles(connection: sqlite3.Connection):
 
 def register_new_driver(
     connection: sqlite3.Connection, driver: Driver
-) -> list[bool, str]:
+) -> list[bool | str] | None:
 
     cursor = connection.cursor()
     # cheque se o email do motorista já está em uso

@@ -3,6 +3,20 @@ main_window = """
     
 """
 
+# - CSS da tela de apresentação
+login_and_register_buttons = """
+    border: 1px solid grey;
+    border-radius: 15px;
+    font-size: 15px;
+"""
+login_and_register_buttons_highlighted = """
+    border: 1px solid grey;
+    background-color: grey;
+    border-radius: 15px;
+    font-size: 15px;
+"""
+
+# - CSS da tela de cadastro de motorista
 registration_forms = """
     background-color: #303030;
     color: white;
@@ -12,7 +26,6 @@ registration_forms = """
 
 registration_title = """
     font-size: 35px;
-    
 """
 
 registration_label_guide = """
@@ -65,3 +78,4 @@ btn_close_popup = """
     font-size: 12px;
     font-weight: bold;
 """
+
