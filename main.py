@@ -27,6 +27,8 @@ class MainWindow(QtWidgets.QWidget):
 
         self.driver_registration_form = DriverRegistrationForm(parent=self)
 
+        self.driver_login_form = DriverLoginForm(parent=self)
+
         self.informative_popup = InformativePopUp(parent=self)
 
 
@@ -575,6 +577,68 @@ class DriverRegistrationForm(QtWidgets.QLabel):
                 )
                 informative_popup.setVisible(True)
 
+class DriverLoginForm(QtWidgets.QLabel):
+    def __init__(self, parent: MainWindow):
+        super(DriverLoginForm, self).__init__(parent=parent)
+        self.setVisible(False)
+        self.setStyleSheet(css.registration_forms)
+
+        user_screen = QtGui.QGuiApplication.primaryScreen()
+        user_screen_geometry = user_screen.availableGeometry()
+        self.setFixedSize(
+            user_screen_geometry.width() * 2 / 5, user_screen_geometry.height()
+        )
+        self.move(0, 0)
+
+        margin_left = 30
+        space_between_elements = 5
+        inputs_width = self.width() - margin_left * 2
+        inputs_height = 30
+        labels_height = 30
+
+        self.driver_login_title = QtWidgets.QLabel(
+            "Login", parent=self
+        )
+        self.driver_login_title.setFixedWidth(len(self.driver_login_title.text()) * 18 )
+        self.driver_login_title.setStyleSheet(css.registration_title)
+        self.driver_login_title.move(
+            self.width() // 2 - self.driver_login_title.width() // 2,
+            self.height() // 2
+            - 5 * (space_between_elements * 6 + inputs_height + labels_height) // 2
+            - self.driver_login_title.height() // 2
+            - 80,
+        )
+
+        self.login_section = QtWidgets.QLabel(parent=self)
+        self.login_section.setFixedSize(
+            self.width(),
+            inputs_height * 8
+        )
+        self.login_section.setStyleSheet(css.login_section)
+        self.login_section.move(0, self.height() // 2 - self.login_section.height() // 2)
+
+        self.lbl_cpf = QtWidgets.QLabel(
+            "CPF: (Apenas números)", parent=self.login_section
+        )
+        self.lbl_cpf.setStyleSheet(css.registration_label_guide)
+        self.lbl_cpf.move(
+            margin_left,
+            0
+        )
+
+        self.input_cpf = QtWidgets.QLineEdit(parent=self.login_section)
+
+        self.input_cpf.setValidator(QtGui.QRegularExpressionValidator("[0-9]{11}"))
+        self.input_cpf.setStyleSheet(css.registration_input_focused)
+        self.input_cpf.setFixedSize(inputs_width, inputs_height)
+        self.input_cpf.move(
+            margin_left,
+            self.lbl_cpf.y() + self.lbl_cpf.height() + space_between_elements,
+        )
+
+
+
+
 
 class InformativePopUp(QtWidgets.QLabel):
     def __init__(
@@ -673,6 +737,7 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
         self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
             self.btn_login
         )
+        self.btn_login.clicked.connect(self.open_driver_login_form)
 
         self.btn_register = QtWidgets.QPushButton(
             "Cadastrar-se", parent=self.login_or_register_div
@@ -705,6 +770,10 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
         main_window.driver_registration_form.show()
         self.hide()
 
+    def open_driver_login_form(self):
+        main_window = self.parent()
+        main_window.driver_login_form.show()
+        self.hide()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication()

@@ -79,3 +79,7 @@ btn_close_popup = """
     font-weight: bold;
 """
 
+# login section css
+login_section = """
+    background-color: blue;
+"""
