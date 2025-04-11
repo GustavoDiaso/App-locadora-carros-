@@ -1,4 +1,5 @@
 from PySide6 import QtWidgets, QtCore, QtGui
+from datetime import datetime, timedelta
 from CSS import css
 from pathlib import Path
 import sqlite3
@@ -384,6 +385,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
                 target_input.setReadOnly(True)
 
     def next_drivers_page(self):
+        print(self.check_valid_birthdate())
+
         if self.btn_next_stage_driver_info.state == "deactivated":
             self.btn_next_stage_driver_info.state = "activated"
             self.driver_informations_section1.setVisible(False)
@@ -454,6 +457,13 @@ class DriverRegistrationForm(QtWidgets.QLabel):
 
         return True
 
+    def check_valid_birthdate(self):
+        birth_date = datetime.strptime(self.input_birth_date.text(), r"%d/%m/%Y")
+        today = datetime.now()
+        years_of_difference = today.year - birth_date.year
+
+        return True if years_of_difference >= 18 else False
+
     def all_data_provided(self):
         conditions = [
             self.input_address.text() != "",
@@ -475,7 +485,6 @@ class DriverRegistrationForm(QtWidgets.QLabel):
 
     def clear_driver_forms_inputs(self):
         self.input_address.setText("")
-        self.input_cpf.setText("")
         self.input_birth_date.setDate(QtCore.QDate.currentDate())
         self.input_email.setText("")
         self.input_cnh.setText("")
@@ -491,6 +500,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             self.check_valid_email(),
             self.check_valid_phone_number(),
             self.check_valid_cpf(),
+            self.check_valid_birthdate(),
         ]
         nothing_empty = self.all_data_provided()
 
@@ -635,49 +645,50 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
         buttons_height = 60
         buttons_width = 120
 
-        self.welcome_title = QtWidgets.QLabel(
-            "Seja bem-vindo", parent=self
-        )
-        self.welcome_title.setFixedWidth(len(self.welcome_title.text())*18)
+        self.welcome_title = QtWidgets.QLabel("Seja bem-vindo", parent=self)
+        self.welcome_title.setFixedWidth(len(self.welcome_title.text()) * 18)
         self.welcome_title.setStyleSheet(css.registration_title)
         self.welcome_title.move(
             self.width() // 2 - self.welcome_title.width() // 2,
-            self.height()//2 - buttons_height // 2 - self.welcome_title.height() - 60
+            self.height() // 2 - buttons_height // 2 - self.welcome_title.height() - 60,
         )
 
         self.login_or_register_div = QtWidgets.QLabel(parent=self)
-        self.login_or_register_div.setFixedSize(
-            self.width(),
-            buttons_height
-        )
+        self.login_or_register_div.setFixedSize(self.width(), buttons_height)
         self.login_or_register_div.move(
-            0,
-            self.height()//2 - self.login_or_register_div.height()//2
+            0, self.height() // 2 - self.login_or_register_div.height() // 2
         )
 
-        self.btn_login = QtWidgets.QPushButton("Fazer login",parent=self.login_or_register_div)
+        self.btn_login = QtWidgets.QPushButton(
+            "Fazer login", parent=self.login_or_register_div
+        )
         self.btn_login.setStyleSheet(css.login_and_register_buttons)
         self.btn_login.setFixedSize(buttons_width, buttons_height)
         self.btn_login.move(
-            self.width() // 2 - buttons_width - space_between_the_buttons,
-            0
+            self.width() // 2 - buttons_width - space_between_the_buttons, 0
         )
         self.btn_login.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         self.btn_login.highlighted = False
         self.btn_login.enterEvent = lambda event: self.emphasize_button(self.btn_login)
-        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(self.btn_login)
+        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
+            self.btn_login
+        )
 
-        self.btn_register = QtWidgets.QPushButton("Cadastrar-se", parent=self.login_or_register_div)
+        self.btn_register = QtWidgets.QPushButton(
+            "Cadastrar-se", parent=self.login_or_register_div
+        )
         self.btn_register.setStyleSheet(css.login_and_register_buttons)
         self.btn_register.setFixedSize(buttons_width, buttons_height)
-        self.btn_register.move(
-            self.width() // 2 + space_between_the_buttons,
-            0
-        )
+        self.btn_register.move(self.width() // 2 + space_between_the_buttons, 0)
         self.btn_register.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         self.btn_register.highlighted = False
-        self.btn_register.enterEvent = lambda event: self.emphasize_button(self.btn_register)
-        self.btn_register.leaveEvent = lambda event: self.deemphasize_button(self.btn_register)
+        self.btn_register.enterEvent = lambda event: self.emphasize_button(
+            self.btn_register
+        )
+        self.btn_register.leaveEvent = lambda event: self.deemphasize_button(
+            self.btn_register
+        )
+        self.btn_register.clicked.connect(self.open_driver_registration_form)
 
     def emphasize_button(self, button: QtWidgets.QPushButton):
         if not button.highlighted:
@@ -689,10 +700,10 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
             button.highlighted = False
             button.setStyleSheet(css.login_and_register_buttons)
 
-
-
-
-
+    def open_driver_registration_form(self):
+        main_window = self.parent()
+        main_window.driver_registration_form.show()
+        self.hide()
 
 
 if __name__ == "__main__":
