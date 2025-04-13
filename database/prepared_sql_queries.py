@@ -9,7 +9,16 @@ class Driver:
     """this class instanciates new drivers that will be added to the database"""
 
     def __init__(
-        self, full_name, cpf, birth_date, address, phone, email, password, cnh
+        self,
+        full_name,
+        cpf,
+        birth_date,
+        address,
+        phone,
+        email,
+        password,
+        cnh,
+        permission_level="user",
     ):
         self.full_name = full_name
         self.cpf = cpf
@@ -19,6 +28,7 @@ class Driver:
         self.email = email
         self.password = password
         self.cnh = cnh
+        self.permission_level = permission_level
 
     def __repr__(self):
         repr = f"""
@@ -30,7 +40,7 @@ class Driver:
         EMAIL: {self.email}
         PASSWORD: {self.password}
         CNH: {self.cnh}
-
+        PERMISSION LEVEL {self.permission_level}
         """
         return repr
 
@@ -48,7 +58,8 @@ def create_table_drivers(connection: sqlite3.Connection):
             phone_number TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
-            cnh_number TEXT UNIQUE NOT NULL
+            cnh_number TEXT UNIQUE NOT NULL,
+            permission_level TEXT NOT NULL
         );
         """
     )
@@ -134,10 +145,11 @@ def register_new_driver(
                     birth_date,
                     address ,
                     phone_number,
-                    email ,
-                    password ,
-                    cnh_number
-                ) VALUES (?,?,?,?,?,?,?,?)
+                    email,
+                    password,
+                    cnh_number,
+                    permission_level
+                ) VALUES (?,?,?,?,?,?,?,?,?)
             """,
             [
                 driver.full_name,
@@ -148,6 +160,7 @@ def register_new_driver(
                 driver.email,
                 driver.password,
                 driver.cnh,
+                driver.permission_level,
             ],
         )
 

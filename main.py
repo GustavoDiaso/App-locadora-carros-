@@ -23,6 +23,8 @@ class MainWindow(QtWidgets.QWidget):
         user_screen_geometry = user_screen.availableGeometry()
         self.setMinimumSize(user_screen_geometry.width(), user_screen_geometry.height())
 
+        self.logged_in_user = None
+
         self.login_or_register_window = LoginOrRegisterSideMenu(parent=self)
 
         self.driver_registration_form = DriverRegistrationForm(parent=self)
@@ -85,7 +87,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             parent=self.driver_informations_section1
         )
         self.input_fullname.setValidator(
-            QtGui.QRegularExpressionValidator("[a-zA-Z\s]+")
+            QtGui.QRegularExpressionValidator("[a-zA-Z\\s]+")
         )
         self.input_fullname.setStyleSheet(css.registration_input_focused)
         self.input_fullname.setFixedSize(inputs_width, inputs_height)
@@ -150,7 +152,9 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             parent=self.driver_informations_section1
         )
         self.input_address.setValidator(
-            QtGui.QRegularExpressionValidator("[a-zA-Z\s0-9,áéíóúãõôâçÁÉÍÓÚÃÕÔÂÇ\.\-]+")
+            QtGui.QRegularExpressionValidator(
+                "[a-zA-Z0-9,áéíóúãõôâçÁÉÍÓÚÃÕÔÂÇ\\.\\-\\s]+"
+            )
         )
         self.input_address.setStyleSheet(css.registration_input_focused)
         self.input_address.setFixedSize(inputs_width, inputs_height)
@@ -577,6 +581,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
                 )
                 informative_popup.setVisible(True)
 
+
 class DriverLoginForm(QtWidgets.QLabel):
     def __init__(self, parent: MainWindow):
         super(DriverLoginForm, self).__init__(parent=parent)
@@ -596,35 +601,32 @@ class DriverLoginForm(QtWidgets.QLabel):
         inputs_height = 30
         labels_height = 30
 
-        self.driver_login_title = QtWidgets.QLabel(
-            "Login", parent=self
-        )
-        self.driver_login_title.setFixedWidth(len(self.driver_login_title.text()) * 18 )
+        self.driver_login_title = QtWidgets.QLabel("Login", parent=self)
+        self.driver_login_title.setFixedWidth(len(self.driver_login_title.text()) * 18)
         self.driver_login_title.setStyleSheet(css.registration_title)
         self.driver_login_title.move(
             self.width() // 2 - self.driver_login_title.width() // 2,
             self.height() // 2
-            - 5 * (space_between_elements * 6 + inputs_height + labels_height) // 2
-            - self.driver_login_title.height() // 2
-            - 80,
+            - (labels_height + space_between_elements * 7 + inputs_height) * 3 / 2
+            - 90,
         )
 
         self.login_section = QtWidgets.QLabel(parent=self)
         self.login_section.setFixedSize(
             self.width(),
-            inputs_height * 8
+            (labels_height + space_between_elements * 7 + inputs_height) * 3,
         )
         self.login_section.setStyleSheet(css.login_section)
-        self.login_section.move(0, self.height() // 2 - self.login_section.height() // 2)
+        self.login_section.move(
+            0, self.height() // 2 - self.login_section.height() // 2
+        )
 
         self.lbl_cpf = QtWidgets.QLabel(
             "CPF: (Apenas números)", parent=self.login_section
         )
+        self.lbl_cpf.setFixedHeight(labels_height)
         self.lbl_cpf.setStyleSheet(css.registration_label_guide)
-        self.lbl_cpf.move(
-            margin_left,
-            0
-        )
+        self.lbl_cpf.move(margin_left, 0)
 
         self.input_cpf = QtWidgets.QLineEdit(parent=self.login_section)
 
@@ -636,8 +638,71 @@ class DriverLoginForm(QtWidgets.QLabel):
             self.lbl_cpf.y() + self.lbl_cpf.height() + space_between_elements,
         )
 
+        self.lbl_password = QtWidgets.QLabel("Senha:", parent=self.login_section)
+        self.lbl_password.setFixedHeight(labels_height)
+        self.lbl_password.setStyleSheet(css.registration_label_guide)
+        self.lbl_password.move(
+            margin_left, self.input_cpf.y() + inputs_height + space_between_elements * 6
+        )
 
+        self.input_password = QtWidgets.QLineEdit(parent=self.login_section)
+        self.input_password.setMaxLength(25)
+        self.input_password.setStyleSheet(css.registration_input)
+        self.input_password.setFixedSize(inputs_width, inputs_height)
+        self.input_password.move(
+            margin_left,
+            self.lbl_password.y() + labels_height + space_between_elements,
+        )
+        self.input_password.mousePressEvent = lambda event: (
+            self.enter_password_mode(self.input_password),
+        )
+        self.input_password.focusOutEvent = lambda event: (
+            self.exit_password_mode(event, self.input_password),
+        )
 
+        self.btn_login = QtWidgets.QPushButton("Login", parent=self.login_section)
+        self.btn_login.setFixedSize(150, 60)
+        self.btn_login.move(
+            self.width() // 2 - self.btn_login.width() // 2,
+            self.input_password.y() + inputs_height + space_between_elements * 10,
+        )
+        self.btn_login.setStyleSheet(css.login_and_register_buttons)
+        self.btn_login.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_login.highlighted = False
+        self.btn_login.enterEvent = lambda event: self.emphasize_button(self.btn_login)
+        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
+            self.btn_login
+        )
+
+    def enter_password_mode(self, target_input: QtWidgets.QLineEdit):
+        if target_input.echoMode() == QtWidgets.QLineEdit.EchoMode.Normal:
+            target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+            target_input.setReadOnly(False)
+
+    def exit_password_mode(
+        self, event, target_input: QtWidgets.QLineEdit, placeholder=""
+    ):
+        if isinstance(event, QtGui.QFocusEvent):
+            if event.lostFocus():
+                if target_input.text() == "" or target_input.text() == placeholder:
+                    target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
+                    target_input.setText(placeholder)
+                    target_input.setReadOnly(True)
+
+        elif isinstance(event, QtGui.QMouseEvent):
+            if event.button().LeftButton:
+                target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
+                target_input.setReadOnly(False)
+
+    def emphasize_button(self, button: QtWidgets.QPushButton):
+        if not button.highlighted:
+            button.highlighted = True
+            button.setStyleSheet(css.login_and_register_buttons_highlighted)
+
+    def deemphasize_button(self, button: QtWidgets.QPushButton):
+        if button.highlighted:
+            button.highlighted = False
+            button.setStyleSheet(css.login_and_register_buttons)
 
 
 class InformativePopUp(QtWidgets.QLabel):
@@ -774,6 +839,7 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
         main_window = self.parent()
         main_window.driver_login_form.show()
         self.hide()
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication()
