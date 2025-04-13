@@ -67,6 +67,13 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             - 80,
         )
 
+        self.btn_go_back = QtWidgets.QPushButton("<", parent=self)
+        self.btn_go_back.setFixedSize(30, 30)
+        self.btn_go_back.move(margin_left, self.driver_registration_title.y() + 10)
+        self.btn_go_back.setCursor(QtGui.Qt.CursorShape.PointingHandCursor)
+        self.btn_go_back.setStyleSheet(css.btn_go_back)
+        self.btn_go_back.clicked.connect(self.back_to_main_window)
+
         self.driver_informations_section1 = QtWidgets.QLabel(parent=self)
         self.driver_informations_section1.setStyleSheet(css.driver_informations_section)
         self.driver_informations_section1.setFixedSize(
@@ -344,7 +351,9 @@ class DriverRegistrationForm(QtWidgets.QLabel):
         self.btn_register_driver = QtWidgets.QPushButton(
             "Cadastrar", parent=self.driver_informations_section2
         )
-        self.btn_register_driver.setFixedSize(120, 50)
+        self.btn_register_driver.setFixedSize(120, 60)
+        self.btn_register_driver.setStyleSheet(css.login_and_register_buttons)
+        self.btn_register_driver.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
         self.btn_register_driver.move(
             self.driver_informations_section2.width() // 2
             - self.btn_register_driver.width() // 2,
@@ -390,6 +399,11 @@ class DriverRegistrationForm(QtWidgets.QLabel):
 
                 target_input.setReadOnly(True)
 
+    def back_to_main_window(self):
+        main_window: MainWindow = self.parent()
+        main_window.login_or_register_window.show()
+        self.hide()
+
     def next_drivers_page(self):
         print(self.check_valid_birthdate())
 
@@ -412,6 +426,9 @@ class DriverRegistrationForm(QtWidgets.QLabel):
         if target_input.echoMode() == QtWidgets.QLineEdit.EchoMode.Normal:
             target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
 
+        target_input.setReadOnly(False)
+        target_input.setFocus()
+
     def exit_password_mode(
         self, event, target_input: QtWidgets.QLineEdit, placeholder=""
     ):
@@ -420,6 +437,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
                 if target_input.text() == "" or target_input.text() == placeholder:
                     target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
                     target_input.setText(placeholder)
+
+                target_input.clearFocus()
 
         elif isinstance(event, QtGui.QMouseEvent):
             if event.button().LeftButton:
@@ -611,6 +630,13 @@ class DriverLoginForm(QtWidgets.QLabel):
             - 90,
         )
 
+        self.btn_go_back = QtWidgets.QPushButton("<", parent=self)
+        self.btn_go_back.setFixedSize(30, 30)
+        self.btn_go_back.move(margin_left, self.driver_login_title.y() + 10)
+        self.btn_go_back.setCursor(QtGui.Qt.CursorShape.PointingHandCursor)
+        self.btn_go_back.setStyleSheet(css.btn_go_back)
+        self.btn_go_back.clicked.connect(self.back_to_main_window)
+
         self.login_section = QtWidgets.QLabel(parent=self)
         self.login_section.setFixedSize(
             self.width(),
@@ -674,25 +700,48 @@ class DriverLoginForm(QtWidgets.QLabel):
             self.btn_login
         )
 
+        self.btn_eye = QtWidgets.QPushButton(parent=self.login_section)
+        self.btn_eye.setIcon(QtGui.QIcon(str(Path(__file__).parent / "icons/eye.png")))
+        self.btn_eye.setIconSize(QtCore.QSize(40, 40))
+        self.btn_eye.setFixedSize(40, 40)
+        self.btn_eye.move(inputs_width, self.input_password.y() - 6)
+        self.btn_eye.setCursor(QtGui.Qt.CursorShape.PointingHandCursor)
+        self.btn_eye.setStyleSheet(css.eye_icon)
+        self.btn_eye.pressed.connect(self.toggle_password_mode)
+        self.btn_eye.released.connect(self.toggle_password_mode)
+
     def enter_password_mode(self, target_input: QtWidgets.QLineEdit):
         if target_input.echoMode() == QtWidgets.QLineEdit.EchoMode.Normal:
             target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
-            target_input.setReadOnly(False)
+
+        target_input.setReadOnly(False)
+        target_input.setFocus()
 
     def exit_password_mode(
         self, event, target_input: QtWidgets.QLineEdit, placeholder=""
     ):
+        print("chamei")
         if isinstance(event, QtGui.QFocusEvent):
             if event.lostFocus():
                 if target_input.text() == "" or target_input.text() == placeholder:
                     target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
                     target_input.setText(placeholder)
-                    target_input.setReadOnly(True)
+
+                target_input.setReadOnly(True)
 
         elif isinstance(event, QtGui.QMouseEvent):
             if event.button().LeftButton:
                 target_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
                 target_input.setReadOnly(False)
+
+    def toggle_password_mode(self):
+        if self.input_password.echoMode() == QtWidgets.QLineEdit.EchoMode.Normal:
+            self.input_password.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+            self.input_password.setReadOnly(False)
+            self.input_password.setFocus()
+        else:
+            self.input_password.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
+            self.input_password.setReadOnly(True)
 
     def emphasize_button(self, button: QtWidgets.QPushButton):
         if not button.highlighted:
@@ -703,6 +752,11 @@ class DriverLoginForm(QtWidgets.QLabel):
         if button.highlighted:
             button.highlighted = False
             button.setStyleSheet(css.login_and_register_buttons)
+
+    def back_to_main_window(self):
+        main_window: MainWindow = self.parent()
+        main_window.login_or_register_window.show()
+        self.hide()
 
 
 class InformativePopUp(QtWidgets.QLabel):

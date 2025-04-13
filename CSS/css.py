@@ -83,3 +83,14 @@ btn_close_popup = """
 login_section = """
     
 """
+
+eye_icon = """
+    border: None;
+    background-color: None;
+
+"""
+
+btn_go_back = """
+    border: None;
+    font-size: 25px;
+"""
