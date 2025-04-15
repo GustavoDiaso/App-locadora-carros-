@@ -4,47 +4,6 @@ from pathlib import Path
 
 env_variables = dotenv_values(Path(__file__).parent / "database_info.env")
 
-
-class Driver:
-    """this class instanciates new drivers that will be added to the database"""
-
-    def __init__(
-        self,
-        full_name,
-        cpf,
-        birth_date,
-        address,
-        phone,
-        email,
-        password,
-        cnh,
-        permission_level="user",
-    ):
-        self.full_name = full_name
-        self.cpf = cpf
-        self.birth_date = birth_date
-        self.address = address
-        self.phone = phone
-        self.email = email
-        self.password = password
-        self.cnh = cnh
-        self.permission_level = permission_level
-
-    def __repr__(self):
-        repr = f"""
-        Nome: {self.full_name}
-        CPF: {self.cpf}
-        BIRTH DATE: {self.birth_date}
-        ADDRESS: {self.address}
-        PHONE: {self.phone}
-        EMAIL: {self.email}
-        PASSWORD: {self.password}
-        CNH: {self.cnh}
-        PERMISSION LEVEL {self.permission_level}
-        """
-        return repr
-
-
 def create_table_drivers(connection: sqlite3.Connection):
     cursor = connection.cursor()
     cursor.execute(
@@ -108,7 +67,7 @@ def create_table_vehicles(connection: sqlite3.Connection):
 
 
 def register_new_driver(
-    connection: sqlite3.Connection, driver: Driver
+    connection: sqlite3.Connection, driver
 ) -> list[bool | str] | None:
 
     cursor = connection.cursor()
@@ -215,3 +174,18 @@ def clear_table(connection: sqlite3.Connection, table_name: str):
     connection.commit()
 
     cursor.close()
+
+def driver_login(connection: sqlite3.Connection, cpf, password):
+    cursor = connection.cursor()
+
+    response = cursor.execute(
+        f"""
+        SELECT * FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE cpf=? and password=? 
+        """,
+        [cpf, password]
+    ).fetchone()
+
+    connection.commit()
+    cursor.close()
+
+    return response

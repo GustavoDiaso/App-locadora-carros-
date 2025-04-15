@@ -6,6 +6,7 @@ import sqlite3
 import database.prepared_sql_queries as psq
 import re
 
+from CSS.css import informative_popup
 
 DATABASE_PATH = Path(__file__).parent / "database/database.sqlite3"
 connection = sqlite3.connect(DATABASE_PATH)
@@ -13,8 +14,46 @@ connection = sqlite3.connect(DATABASE_PATH)
 psq.create_table_drivers(connection=connection)
 psq.create_table_vehicles(connection=connection)
 
+class Driver:
+    """ This class represents the driver that will be registered in the database or logged in the app"""
+    def __init__(
+        self,
+        full_name,
+        cpf,
+        birth_date,
+        address,
+        phone,
+        email,
+        password,
+        cnh,
+        permission_level="user",
+    ):
+        self.full_name = full_name
+        self.cpf = cpf
+        self.birth_date = birth_date
+        self.address = address
+        self.phone = phone
+        self.email = email
+        self.password = password
+        self.cnh = cnh
+        self.permission_level = permission_level
+
+    def __repr__(self):
+        repr = f"""
+        Nome: {self.full_name}
+        CPF: {self.cpf}
+        BIRTH DATE: {self.birth_date}
+        ADDRESS: {self.address}
+        PHONE: {self.phone}
+        EMAIL: {self.email}
+        PASSWORD: {self.password}
+        CNH: {self.cnh}
+        PERMISSION LEVEL {self.permission_level}
+        """
+        return repr
 
 class MainWindow(QtWidgets.QWidget):
+    """This class represents our main window, where the main widgets are displayed"""
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setStyleSheet(css.main_window)
@@ -25,17 +64,112 @@ class MainWindow(QtWidgets.QWidget):
 
         self.logged_in_user = None
 
-        self.login_or_register_window = LoginOrRegisterSideMenu(parent=self)
+        self.login_and_registration_window = LoginAndRegistrationWindow(parent=self)
+
+        self.informative_popup = InformativePopUp(parent=self)
+
+
+class LoginAndRegistrationWindow(QtWidgets.QLabel):
+    def __init__(self, parent: MainWindow):
+        super(LoginAndRegistrationWindow, self).__init__(parent=parent)
+        self.setFixedSize(self.parent().width(), self.parent().height())
+        self.move(0,0)
+
+        self.login_or_register_side_menu = LoginOrRegisterSideMenu(parent=self)
 
         self.driver_registration_form = DriverRegistrationForm(parent=self)
 
         self.driver_login_form = DriverLoginForm(parent=self)
 
-        self.informative_popup = InformativePopUp(parent=self)
+
+class LoginOrRegisterSideMenu(QtWidgets.QLabel):
+    """This class represents the side window where the driver has the option to log in or register"""
+    def __init__(self, parent: LoginAndRegistrationWindow):
+        super(LoginOrRegisterSideMenu, self).__init__(parent=parent)
+        self.setStyleSheet(css.registration_forms)
+
+        user_screen = QtGui.QGuiApplication.primaryScreen()
+        user_screen_geometry = user_screen.availableGeometry()
+        self.setFixedSize(
+            user_screen_geometry.width() * 2 / 5, user_screen_geometry.height()
+        )
+
+        self.move(0, 0)
+
+        space_between_the_buttons = 10
+        buttons_height = 60
+        buttons_width = 120
+
+        self.welcome_title = QtWidgets.QLabel("Seja bem-vindo", parent=self)
+        self.welcome_title.setFixedWidth(len(self.welcome_title.text()) * 18)
+        self.welcome_title.setStyleSheet(css.registration_title)
+        self.welcome_title.move(
+            self.width() // 2 - self.welcome_title.width() // 2,
+            self.height() // 2 - buttons_height // 2 - self.welcome_title.height() - 60,
+        )
+
+        self.login_or_register_div = QtWidgets.QLabel(parent=self)
+        self.login_or_register_div.setFixedSize(self.width(), buttons_height)
+        self.login_or_register_div.move(
+            0, self.height() // 2 - self.login_or_register_div.height() // 2
+        )
+
+        self.btn_login = QtWidgets.QPushButton(
+            "Fazer login", parent=self.login_or_register_div
+        )
+        self.btn_login.setStyleSheet(css.login_and_register_buttons)
+        self.btn_login.setFixedSize(buttons_width, buttons_height)
+        self.btn_login.move(
+            self.width() // 2 - buttons_width - space_between_the_buttons, 0
+        )
+        self.btn_login.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_login.highlighted = False
+        self.btn_login.enterEvent = lambda event: self.emphasize_button(self.btn_login)
+        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
+            self.btn_login
+        )
+        self.btn_login.clicked.connect(self.open_driver_login_form)
+
+        self.btn_register = QtWidgets.QPushButton(
+            "Cadastrar-se", parent=self.login_or_register_div
+        )
+        self.btn_register.setStyleSheet(css.login_and_register_buttons)
+        self.btn_register.setFixedSize(buttons_width, buttons_height)
+        self.btn_register.move(self.width() // 2 + space_between_the_buttons, 0)
+        self.btn_register.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_register.highlighted = False
+        self.btn_register.enterEvent = lambda event: self.emphasize_button(
+            self.btn_register
+        )
+        self.btn_register.leaveEvent = lambda event: self.deemphasize_button(
+            self.btn_register
+        )
+        self.btn_register.clicked.connect(self.open_driver_registration_form)
+
+    def emphasize_button(self, button: QtWidgets.QPushButton):
+        if not button.highlighted:
+            button.highlighted = True
+            button.setStyleSheet(css.login_and_register_buttons_highlighted)
+
+    def deemphasize_button(self, button: QtWidgets.QPushButton):
+        if button.highlighted:
+            button.highlighted = False
+            button.setStyleSheet(css.login_and_register_buttons)
+
+    def open_driver_registration_form(self):
+        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window.driver_registration_form.show()
+        self.hide()
+
+    def open_driver_login_form(self):
+        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window.driver_login_form.show()
+        self.hide()
 
 
 class DriverRegistrationForm(QtWidgets.QLabel):
-    def __init__(self, parent: MainWindow):
+    """This class represents the form utilized to register a new driver"""
+    def __init__(self, parent: LoginAndRegistrationWindow):
         super(DriverRegistrationForm, self).__init__(parent=parent)
         self.setVisible(False)
         self.setStyleSheet(css.registration_forms)
@@ -72,7 +206,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
         self.btn_go_back.move(margin_left, self.driver_registration_title.y() + 10)
         self.btn_go_back.setCursor(QtGui.Qt.CursorShape.PointingHandCursor)
         self.btn_go_back.setStyleSheet(css.btn_go_back)
-        self.btn_go_back.clicked.connect(self.back_to_main_window)
+        self.btn_go_back.clicked.connect(self.back_to_login_and_registration_window)
 
         self.driver_informations_section1 = QtWidgets.QLabel(parent=self)
         self.driver_informations_section1.setStyleSheet(css.driver_informations_section)
@@ -399,14 +533,12 @@ class DriverRegistrationForm(QtWidgets.QLabel):
 
                 target_input.setReadOnly(True)
 
-    def back_to_main_window(self):
-        main_window: MainWindow = self.parent()
-        main_window.login_or_register_window.show()
+    def back_to_login_and_registration_window(self):
+        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window.login_or_register_side_menu.show()
         self.hide()
 
     def next_drivers_page(self):
-        print(self.check_valid_birthdate())
-
         if self.btn_next_stage_driver_info.state == "deactivated":
             self.btn_next_stage_driver_info.state = "activated"
             self.driver_informations_section1.setVisible(False)
@@ -529,7 +661,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
         ]
         nothing_empty = self.all_data_provided()
 
-        main_window: MainWindow = self.parent()
+        main_window: MainWindow = self.parent().parent()
         informative_popup: InformativePopUp = main_window.informative_popup
 
         # Se todas as condições especiais forem satisfeitas e todos os dados tiverem
@@ -544,7 +676,7 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             password = self.input_password_first.text()
             cnh = self.input_cnh.text()
 
-            driver = psq.Driver(
+            driver = Driver(
                 full_name=full_name,
                 cpf=cpf,
                 birth_date=birth_date,
@@ -602,7 +734,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
 
 
 class DriverLoginForm(QtWidgets.QLabel):
-    def __init__(self, parent: MainWindow):
+    """This class represents the form where the driver tries to log in """
+    def __init__(self, parent: LoginAndRegistrationWindow):
         super(DriverLoginForm, self).__init__(parent=parent)
         self.setVisible(False)
         self.setStyleSheet(css.registration_forms)
@@ -635,7 +768,7 @@ class DriverLoginForm(QtWidgets.QLabel):
         self.btn_go_back.move(margin_left, self.driver_login_title.y() + 10)
         self.btn_go_back.setCursor(QtGui.Qt.CursorShape.PointingHandCursor)
         self.btn_go_back.setStyleSheet(css.btn_go_back)
-        self.btn_go_back.clicked.connect(self.back_to_main_window)
+        self.btn_go_back.clicked.connect(self.back_to_login_and_registration_window)
 
         self.login_section = QtWidgets.QLabel(parent=self)
         self.login_section.setFixedSize(
@@ -699,6 +832,7 @@ class DriverLoginForm(QtWidgets.QLabel):
         self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
             self.btn_login
         )
+        self.btn_login.clicked.connect(self.try_to_login)
 
         self.btn_eye = QtWidgets.QPushButton(parent=self.login_section)
         self.btn_eye.setIcon(QtGui.QIcon(str(Path(__file__).parent / "icons/eye.png")))
@@ -720,7 +854,6 @@ class DriverLoginForm(QtWidgets.QLabel):
     def exit_password_mode(
         self, event, target_input: QtWidgets.QLineEdit, placeholder=""
     ):
-        print("chamei")
         if isinstance(event, QtGui.QFocusEvent):
             if event.lostFocus():
                 if target_input.text() == "" or target_input.text() == placeholder:
@@ -753,13 +886,51 @@ class DriverLoginForm(QtWidgets.QLabel):
             button.highlighted = False
             button.setStyleSheet(css.login_and_register_buttons)
 
-    def back_to_main_window(self):
-        main_window: MainWindow = self.parent()
-        main_window.login_or_register_window.show()
+    def back_to_login_and_registration_window(self):
+        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window.login_or_register_side_menu.show()
         self.hide()
+
+    def try_to_login(self):
+        main_window: MainWindow = self.parent().parent()
+        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        informative_popup = main_window.informative_popup
+
+        cpf = self.input_cpf.text()
+        password = self.input_password.text()
+
+        if len(cpf) == 11 and len(password) > 0:
+            driver_informations = psq.driver_login(connection, cpf, password)
+
+            if driver_informations is not None:
+                main_window.logged_in_user = Driver(
+                    full_name=driver_informations[1],
+                    cpf=driver_informations[2],
+                    birth_date=driver_informations[3],
+                    address=driver_informations[4],
+                    phone=driver_informations[5],
+                    email=driver_informations[6],
+                    password=driver_informations[7],
+                    cnh=driver_informations[8],
+                    permission_level=driver_informations[9]
+                )
+                informative_popup.popup_header.setText("Bem-vindo")
+                informative_popup.lbl_information.setText(f"É bom te ver, {main_window.logged_in_user.full_name}")
+
+            else:
+                informative_popup.popup_header.setText("Operação malsucedida")
+                informative_popup.lbl_information.setText("CPF ou senha incorretos")
+
+        else:
+            informative_popup.popup_header.setText("Operação malsucedida")
+            informative_popup.lbl_information.setText("Informe o CPF e a senha")
+
+
+        informative_popup.setVisible(True)
 
 
 class InformativePopUp(QtWidgets.QLabel):
+    """This class represents the popup that appears in the screen every time we wanna show something"""
     def __init__(
         self,
         parent: MainWindow,
@@ -811,88 +982,6 @@ class InformativePopUp(QtWidgets.QLabel):
             self.show()
 
 
-class LoginOrRegisterSideMenu(QtWidgets.QLabel):
-    def __init__(self, parent: MainWindow):
-        super(LoginOrRegisterSideMenu, self).__init__(parent=parent)
-        self.setStyleSheet(css.registration_forms)
-
-        user_screen = QtGui.QGuiApplication.primaryScreen()
-        user_screen_geometry = user_screen.availableGeometry()
-        self.setFixedSize(
-            user_screen_geometry.width() * 2 / 5, user_screen_geometry.height()
-        )
-
-        self.move(0, 0)
-
-        space_between_the_buttons = 10
-        buttons_height = 60
-        buttons_width = 120
-
-        self.welcome_title = QtWidgets.QLabel("Seja bem-vindo", parent=self)
-        self.welcome_title.setFixedWidth(len(self.welcome_title.text()) * 18)
-        self.welcome_title.setStyleSheet(css.registration_title)
-        self.welcome_title.move(
-            self.width() // 2 - self.welcome_title.width() // 2,
-            self.height() // 2 - buttons_height // 2 - self.welcome_title.height() - 60,
-        )
-
-        self.login_or_register_div = QtWidgets.QLabel(parent=self)
-        self.login_or_register_div.setFixedSize(self.width(), buttons_height)
-        self.login_or_register_div.move(
-            0, self.height() // 2 - self.login_or_register_div.height() // 2
-        )
-
-        self.btn_login = QtWidgets.QPushButton(
-            "Fazer login", parent=self.login_or_register_div
-        )
-        self.btn_login.setStyleSheet(css.login_and_register_buttons)
-        self.btn_login.setFixedSize(buttons_width, buttons_height)
-        self.btn_login.move(
-            self.width() // 2 - buttons_width - space_between_the_buttons, 0
-        )
-        self.btn_login.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        self.btn_login.highlighted = False
-        self.btn_login.enterEvent = lambda event: self.emphasize_button(self.btn_login)
-        self.btn_login.leaveEvent = lambda event: self.deemphasize_button(
-            self.btn_login
-        )
-        self.btn_login.clicked.connect(self.open_driver_login_form)
-
-        self.btn_register = QtWidgets.QPushButton(
-            "Cadastrar-se", parent=self.login_or_register_div
-        )
-        self.btn_register.setStyleSheet(css.login_and_register_buttons)
-        self.btn_register.setFixedSize(buttons_width, buttons_height)
-        self.btn_register.move(self.width() // 2 + space_between_the_buttons, 0)
-        self.btn_register.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        self.btn_register.highlighted = False
-        self.btn_register.enterEvent = lambda event: self.emphasize_button(
-            self.btn_register
-        )
-        self.btn_register.leaveEvent = lambda event: self.deemphasize_button(
-            self.btn_register
-        )
-        self.btn_register.clicked.connect(self.open_driver_registration_form)
-
-    def emphasize_button(self, button: QtWidgets.QPushButton):
-        if not button.highlighted:
-            button.highlighted = True
-            button.setStyleSheet(css.login_and_register_buttons_highlighted)
-
-    def deemphasize_button(self, button: QtWidgets.QPushButton):
-        if button.highlighted:
-            button.highlighted = False
-            button.setStyleSheet(css.login_and_register_buttons)
-
-    def open_driver_registration_form(self):
-        main_window = self.parent()
-        main_window.driver_registration_form.show()
-        self.hide()
-
-    def open_driver_login_form(self):
-        main_window = self.parent()
-        main_window.driver_login_form.show()
-        self.hide()
 
 
 if __name__ == "__main__":
