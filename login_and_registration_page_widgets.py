@@ -4,28 +4,27 @@ from CSS import css
 import re
 from pathlib import Path
 
-# importing our modules
-import main
-from database import  prepared_sql_queries as psq
+# Importing our modules
+from database import db_service
 import driver_and_vehicle_objects
 
 class LoginAndRegistrationWindow(QtWidgets.QLabel):
-    def __init__(self, parent: main.MainWindow):
+    def __init__(self, parent):
         super(LoginAndRegistrationWindow, self).__init__(parent=parent)
         self.setFixedSize(self.parent().width(), self.parent().height())
         self.move(0,0)
 
-        self.login_or_register_side_menu = LoginOrRegisterSideMenu(parent=self)
+        self.login_or_register_choice_side_menu = LoginOrRegisterChoiceSideMenu(parent=self)
 
         self.driver_registration_form = DriverRegistrationForm(parent=self)
 
         self.driver_login_form = DriverLoginForm(parent=self)
 
 
-class LoginOrRegisterSideMenu(QtWidgets.QLabel):
+class LoginOrRegisterChoiceSideMenu(QtWidgets.QLabel):
     """This class represents the side window where the driver has the option to log in or register"""
     def __init__(self, parent: LoginAndRegistrationWindow):
-        super(LoginOrRegisterSideMenu, self).__init__(parent=parent)
+        super(LoginOrRegisterChoiceSideMenu, self).__init__(parent=parent)
         self.setStyleSheet(css.registration_forms)
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
@@ -97,12 +96,12 @@ class LoginOrRegisterSideMenu(QtWidgets.QLabel):
             button.setStyleSheet(css.login_and_register_buttons)
 
     def open_driver_registration_form(self):
-        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window = self.parent()
         login_and_registration_window.driver_registration_form.show()
         self.hide()
 
     def open_driver_login_form(self):
-        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        login_and_registration_window = self.parent()
         login_and_registration_window.driver_login_form.show()
         self.hide()
 
@@ -474,8 +473,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
                 target_input.setReadOnly(True)
 
     def back_to_login_and_registration_window(self):
-        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
-        login_and_registration_window.login_or_register_side_menu.show()
+        login_and_registration_window = self.parent()
+        login_and_registration_window.login_or_register_choice_side_menu.show()
         self.hide()
 
     def next_drivers_page(self):
@@ -601,8 +600,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
         ]
         nothing_empty = self.all_data_provided()
 
-        main_window: main.MainWindow = self.parent().parent()
-        informative_popup: main.InformativePopUp = main_window.informative_popup
+        main_window = self.parent().parent()
+        informative_popup = main_window.informative_popup
 
         # Se todas as condições especiais forem satisfeitas e todos os dados tiverem
         # sido fornecidos...
@@ -629,8 +628,8 @@ class DriverRegistrationForm(QtWidgets.QLabel):
             self.lbl_pwrd_dont_match.setVisible(False)
 
             # Vamos tentar fazer o cadastro do motorista no banco de dados:
-            driver_registration_status = psq.register_new_driver(
-                connection=main.connection, driver=driver
+            driver_registration_status = db_service.register_new_driver(
+                driver=driver
             )
 
             informative_popup.popup_header.setText("Operação malsucedida")
@@ -827,20 +826,20 @@ class DriverLoginForm(QtWidgets.QLabel):
             button.setStyleSheet(css.login_and_register_buttons)
 
     def back_to_login_and_registration_window(self):
-        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
-        login_and_registration_window.login_or_register_side_menu.show()
+        login_and_registration_window = self.parent()
+        login_and_registration_window.login_or_register_choice_side_menu.show()
         self.hide()
 
     def try_to_login(self):
-        main_window: main.MainWindow = self.parent().parent()
-        login_and_registration_window: LoginAndRegistrationWindow = self.parent()
+        main_window = self.parent().parent()
+        login_and_registration_window = self.parent()
         informative_popup = main_window.informative_popup
 
         cpf = self.input_cpf.text()
         password = self.input_password.text()
 
         if len(cpf) == 11 and len(password) > 0:
-            driver_informations = psq.driver_login(main.connection, cpf, password)
+            driver_informations = db_service.driver_login(cpf, password)
 
             if driver_informations is not None:
                 main_window.logged_in_user = driver_and_vehicle_objects.Driver(

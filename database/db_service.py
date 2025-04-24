@@ -1,11 +1,33 @@
 import sqlite3
-from dotenv import load_dotenv, dotenv_values
+from dotenv import dotenv_values
 from pathlib import Path
 
 env_variables = dotenv_values(Path(__file__).parent / "database_info.env")
 
-def create_table_drivers(connection: sqlite3.Connection):
-    cursor = connection.cursor()
+_connection: sqlite3.Connection | None = None
+
+def set_connection(connection):
+    global _connection
+    _connection = connection
+
+
+def _check_connection():
+    if _connection is None:
+        raise RuntimeError(
+            """
+            Nenhuma conexão com o banco de dados foi inicializada. 
+            Conecte-se ao banco de dados antes de tentar executar qualquer query. 
+
+            use db_service.set_connection()
+            """
+        )
+
+
+def create_table_drivers():
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
     cursor.execute(
         f"""
         CREATE TABLE IF NOT EXISTS {env_variables['DRIVERS_TABLE_NAME']} (
@@ -22,30 +44,37 @@ def create_table_drivers(connection: sqlite3.Connection):
         );
         """
     )
-    connection.commit()
+    _connection.commit()
     cursor.close()
 
 
-def drop_table_drivers(connection: sqlite3.Connection):
-    cursor = connection.cursor()
+def drop_table_drivers():
+    _check_connection()
 
+    global _connection
+    cursor = _connection.cursor()
     cursor.execute(f"DROP TABLE {env_variables['DRIVERS_TABLE_NAME']}")
 
-    connection.commit()
+    _connection.commit()
     cursor.close()
 
 
-def drop_table_vehicles(connection: sqlite3.Connection):
-    cursor = connection.cursor()
+def drop_table_vehicles():
+    _check_connection()
 
+    global _connection
+    cursor = _connection.cursor()
     cursor.execute(f"DROP TABLE {env_variables['VEHICLES_TABLE_NAME']}")
 
-    connection.commit()
+    _connection.commit()
     cursor.close()
 
 
-def create_table_vehicles(connection: sqlite3.Connection):
-    cursor = connection.cursor()
+def create_table_vehicles():
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
     cursor.execute(
         f"""
         CREATE TABLE IF NOT EXISTS {env_variables['VEHICLES_TABLE_NAME']} (
@@ -62,15 +91,17 @@ def create_table_vehicles(connection: sqlite3.Connection):
         );
         """
     )
-    connection.commit()
+    _connection.commit()
     cursor.close()
 
 
-def register_new_driver(
-    connection: sqlite3.Connection, driver
-) -> list[bool | str] | None:
+def register_new_driver(driver) -> list[bool | str] | None:
+    _check_connection()
 
-    cursor = connection.cursor()
+    global _connection
+    cursor = _connection.cursor()
+
+    cursor = _connection.cursor()
     # cheque se o email do motorista já está em uso
     users_with_same_email = cursor.execute(
         f"SELECT COUNT(*) FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE email=?",
@@ -123,7 +154,7 @@ def register_new_driver(
             ],
         )
 
-        connection.commit()
+        _connection.commit()
 
         register_confirmation = cursor.execute(
             f"""
@@ -154,8 +185,11 @@ def register_new_driver(
                         return [False, "CNH já cadastrada"]
 
 
-def clear_table(connection: sqlite3.Connection, table_name: str):
-    cursor = connection.cursor()
+def clear_table(table_name: str):
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
 
     # limpa a tabela inteira
     cursor.execute(
@@ -171,12 +205,15 @@ def clear_table(connection: sqlite3.Connection, table_name: str):
         """
     )
 
-    connection.commit()
+    _connection.commit()
 
     cursor.close()
 
-def driver_login(connection: sqlite3.Connection, cpf, password):
-    cursor = connection.cursor()
+def driver_login(cpf, password):
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
 
     response = cursor.execute(
         f"""
@@ -185,7 +222,7 @@ def driver_login(connection: sqlite3.Connection, cpf, password):
         [cpf, password]
     ).fetchone()
 
-    connection.commit()
+    _connection.commit()
     cursor.close()
 
     return response
