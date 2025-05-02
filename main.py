@@ -8,6 +8,7 @@ import database.db_service as db_service
 import login_and_registration_page_widgets as lrwidgets
 import informative_popup as infpopup
 import driver_and_vehicle_objects
+import header
 
 
 
@@ -35,6 +36,8 @@ class MainWindow(QtWidgets.QWidget):
         self.login_and_registration_window.hide()
 
         self.informative_popup = infpopup.InformativePopUp(parent=self)
+
+        self.header = header.Header(parent=self)
 
 
 if __name__ == "__main__":
