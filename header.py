@@ -1,12 +1,10 @@
 from PySide6 import QtWidgets, QtCore, QtGui
-from datetime import datetime
 from CSS import header_css
-import re
 from pathlib import Path
 
 class Header(QtWidgets.QLabel):
-    def __init__(self, parent):
-        super(Header, self).__init__(parent)
+    def __init__(self, main_window):
+        super(Header, self).__init__(parent=main_window)
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
         user_screen_geometry = user_screen.availableGeometry()
@@ -22,7 +20,7 @@ class Header(QtWidgets.QLabel):
         self.logo.setFixedSize(100, 100)
         self.logo.move(50, self.height()//2 - self.logo.height()//2)
 
-        self.lbl_company_name = QtWidgets.QLabel("RENTACAR.COM",parent=self)
+        self.lbl_company_name = QtWidgets.QLabel("alugarapido.com",parent=self)
         self.lbl_company_name.setStyleSheet(header_css.lbl_company_name)
         self.lbl_company_name.setFixedWidth(len(self.lbl_company_name.text()) * 12)
         self.lbl_company_name.move(
@@ -43,22 +41,30 @@ class Header(QtWidgets.QLabel):
 
         self.grid = QtWidgets.QGridLayout(parent=self.header_options_section)
 
-        self.lbl_rent_car = QtWidgets.QPushButton("Alugar carro")
-        self.lbl_rent_car.setFixedSize(len(self.lbl_rent_car.text()) * 9, 30)
-        self.lbl_rent_car.setStyleSheet(header_css.lbl_options)
-        self.lbl_rent_car.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        self.grid.addWidget(self.lbl_rent_car, 0, 0)
+        self.btn_rent_car = QtWidgets.QPushButton("Alugar carro")
+        self.btn_rent_car.setFixedSize(len(self.btn_rent_car.text()) * 9, 30)
+        self.btn_rent_car.setStyleSheet(header_css.lbl_options)
+        self.btn_rent_car.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.grid.addWidget(self.btn_rent_car, 0, 0)
 
-        self.lbl_rented_cars = QtWidgets.QPushButton("Carros alugados")
-        self.lbl_rented_cars.setFixedSize(len(self.lbl_rented_cars.text()) * 9, 30)
-        self.lbl_rented_cars.setStyleSheet(header_css.lbl_options)
-        self.lbl_rented_cars.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        self.grid.addWidget(self.lbl_rented_cars, 0, 1)
+        self.btn_rented_cars = QtWidgets.QPushButton("Carros alugados")
+        self.btn_rented_cars.setFixedSize(len(self.btn_rented_cars.text()) * 9, 30)
+        self.btn_rented_cars.setStyleSheet(header_css.lbl_options)
+        self.btn_rented_cars.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.grid.addWidget(self.btn_rented_cars, 0, 1)
 
-        self.lbl_exit = QtWidgets.QPushButton("Sair", parent=self.header_options_section)
-        self.lbl_exit.setFixedSize(len(self.lbl_exit.text()) * 9, 30)
-        self.lbl_exit.setStyleSheet(header_css.lbl_options)
-        self.lbl_exit.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-        self.grid.addWidget(self.lbl_exit, 0, 2)
+        self.btn_exit = QtWidgets.QPushButton("Sair", parent=self.header_options_section)
+        self.btn_exit.setFixedSize(len(self.btn_exit.text()) * 9, 30)
+        self.btn_exit.setStyleSheet(header_css.lbl_options)
+        self.btn_exit.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.btn_exit.clicked.connect(self.back_to_login_window)
+        self.grid.addWidget(self.btn_exit, 0, 2)
 
         self.grid.setHorizontalSpacing(40)
+
+
+    def back_to_login_window(self):
+        main_window = self.parent()
+        self.hide()
+        main_window.rent_a_car_window.hide()
+        main_window.login_and_registration_window.show()

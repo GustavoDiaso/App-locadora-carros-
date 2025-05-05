@@ -9,7 +9,7 @@ import login_and_registration_page_widgets as lrwidgets
 import informative_popup as infpopup
 import driver_and_vehicle_objects
 import header
-
+import rent_a_car_window
 
 
 class MainWindow(QtWidgets.QWidget):
@@ -37,7 +37,8 @@ class MainWindow(QtWidgets.QWidget):
 
         self.informative_popup = infpopup.InformativePopUp(parent=self)
 
-        self.header = header.Header(parent=self)
+        self.header = header.Header(main_window=self)
+        self.rent_a_car_window = rent_a_car_window.RentACarWindow(main_window=self)
 
 
 if __name__ == "__main__":
