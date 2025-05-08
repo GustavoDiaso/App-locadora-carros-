@@ -7,7 +7,8 @@ aula207_ola_django/static_files
 .idea
 testes_aleatórios
 docker-compose.yml
-database/database_info.env
+database\database_info.env
+
 
 
 # Byte-compiled / optimized / DLL files

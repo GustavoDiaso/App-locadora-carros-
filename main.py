@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import css
 from dotenv import dotenv_values
 import sqlite3
+from pathlib import Path
 
 # importing our modules
 import database.db_service as db_service
@@ -22,17 +23,19 @@ class MainWindow(QtWidgets.QWidget):
         self.setMinimumSize(user_screen_geometry.width(), user_screen_geometry.height())
 
         self.logged_in_user = driver_and_vehicle_objects.Driver(
-             full_name='Nomefalso Johnson',
-             cpf='98765432109',
-             birth_date='19/06/2004',
-             address='Rua Guarian da Silva - SP - 3232',
-             phone='11_983475637',
-             email='nomefalso@gmail.com',
-             password='1',
-             cnh='4875162200',
+            full_name="Nomefalso Johnson",
+            cpf="98765432109",
+            birth_date="19/06/2004",
+            address="Rua Guarian da Silva - SP - 3232",
+            phone="11_983475637",
+            email="nomefalso@gmail.com",
+            password="1",
+            cnh="4875162200",
         )
 
-        self.login_and_registration_window = lrwidgets.LoginAndRegistrationWindow(parent=self)
+        self.login_and_registration_window = lrwidgets.LoginAndRegistrationWindow(
+            parent=self
+        )
         self.login_and_registration_window.hide()
 
         self.informative_popup = infpopup.InformativePopUp(parent=self)
@@ -42,7 +45,12 @@ class MainWindow(QtWidgets.QWidget):
 
 
 if __name__ == "__main__":
-    connection = sqlite3.connect(db_service.env_variables['DB_PATH'])
+    # Even if the database already exists, It will be recreated. this helps a lot
+    # because I am constantly changing the database.
+
+    db_service.recreate_sqlite_database(Path(__file__).parent / "database", "database")
+
+    connection = sqlite3.connect(db_service.env_variables["DB_PATH"])
     db_service.set_connection(connection)
     db_service.create_table_drivers()
     db_service.create_table_vehicles()
@@ -52,5 +60,6 @@ if __name__ == "__main__":
     main_window.showMaximized()
     app.exec()
 
+    # Since I am testing, I am always cleaning the table drivers.
     db_service.clear_table(table_name="drivers")
     connection.close()

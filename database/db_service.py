@@ -6,6 +6,7 @@ env_variables = dotenv_values(Path(__file__).parent / "database_info.env")
 
 _connection: sqlite3.Connection | None = None
 
+
 def set_connection(connection):
     global _connection
     _connection = connection
@@ -21,6 +22,15 @@ def _check_connection():
             use db_service.set_connection()
             """
         )
+
+
+def recreate_sqlite_database(path: str, database_name: str):
+    full_path = Path(path) / f"{database_name}.sqlite3"
+    try:
+        with open(full_path, "w") as database:
+            pass
+    except Exception:
+        raise Exception("Não foi possível criar o banco de dados.")
 
 
 def create_table_drivers():
@@ -78,15 +88,15 @@ def create_table_vehicles():
     cursor.execute(
         f"""
         CREATE TABLE IF NOT EXISTS {env_variables['VEHICLES_TABLE_NAME']} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT,
             id_owner INTEGER,
-            crv TEXT NOT NULL,
             chassi_number TEXT UNIQUE NOT NULL,
             year of manufacture INTEGER NOT NULL,
             model TEXT NOT NULL,
             color TEXT NOT NULL,
             vehicle_category TEXT NOT NULL,
             plate TEXT NOT NULL,
+            car_return_location TEXT NOT NULL,
             FOREIGN KEY (id_owner) REFERENCES drivers(id)
         );
         """
@@ -209,6 +219,7 @@ def clear_table(table_name: str):
 
     cursor.close()
 
+
 def driver_login(cpf, password):
     _check_connection()
 
@@ -219,7 +230,7 @@ def driver_login(cpf, password):
         f"""
         SELECT * FROM {env_variables['DRIVERS_TABLE_NAME']} WHERE cpf=? and password=? 
         """,
-        [cpf, password]
+        [cpf, password],
     ).fetchone()
 
     _connection.commit()
