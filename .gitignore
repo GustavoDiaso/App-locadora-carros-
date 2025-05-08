@@ -2,12 +2,10 @@ __localcode
 .DS_Store
 chromedriver
 mysql_206
-.env
 aula207_ola_django/static_files
 .idea
 testes_aleatórios
 docker-compose.yml
-database\database_info.env
 
 
 
@@ -141,6 +139,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+database_info.env
 
 # Spyder project settings
 .spyderproject

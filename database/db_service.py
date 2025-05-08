@@ -2,7 +2,7 @@ import sqlite3
 from dotenv import dotenv_values
 from pathlib import Path
 
-env_variables = dotenv_values(Path(__file__).parent / "database_info.env")
+env_variables = dotenv_values(Path(__file__).parent.parent / "database_info.env")
 
 _connection: sqlite3.Connection | None = None
 
