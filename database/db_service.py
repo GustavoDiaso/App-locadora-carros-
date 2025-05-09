@@ -96,6 +96,7 @@ def create_table_vehicles():
             color TEXT NOT NULL,
             plate TEXT NOT NULL,
             car_return_location TEXT NOT NULL,
+            rented BOOLEAN NOT NULL,
             FOREIGN KEY (id_owner) REFERENCES drivers(id)
         );
         """
@@ -237,6 +238,7 @@ def driver_login(cpf, password):
 
     return response
 
+
 def register_new_vehicle(vehicle):
     _check_connection()
 
@@ -252,8 +254,9 @@ def register_new_vehicle(vehicle):
             model,
             color,
             plate,
-            car_return_location
-        ) VALUES (?,?,?,?,?,?,?)
+            car_return_location,
+            rented 
+        ) VALUES (?,?,?,?,?,?,?,?)
         """,
         [
             vehicle.id_owner,
@@ -262,12 +265,14 @@ def register_new_vehicle(vehicle):
             vehicle.model,
             vehicle.color,
             vehicle.plate,
-            vehicle.car_return_location
-        ]
+            vehicle.car_return_location,
+            vehicle.rented,
+        ],
     )
 
     _connection.commit()
     cursor.close()
+
 
 def get_all_vehicles():
     _check_connection()
@@ -277,7 +282,43 @@ def get_all_vehicles():
 
     vehicles = cursor.execute(
         f"""
-        SELECT * FROM {env_variables["VEHICLES_TABLE_NAME"]}
+        SELECT * FROM {env_variables["VEHICLES_TABLE_NAME"]} ORDER BY rented DESC
+        """
+    ).fetchall()
+
+    _connection.commit()
+    cursor.close()
+
+    return vehicles
+
+
+def get_available_vehicles():
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
+
+    vehicles = cursor.execute(
+        f"""
+        SELECT * FROM {env_variables["VEHICLES_TABLE_NAME"]} WHERE rented = 0
+        """
+    ).fetchall()
+
+    _connection.commit()
+    cursor.close()
+
+    return vehicles
+
+
+def get_unavailable_vehicles():
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
+
+    vehicles = cursor.execute(
+        f"""
+        SELECT * FROM {env_variables["VEHICLES_TABLE_NAME"]} WHERE rented = 1
         """
     ).fetchall()
 

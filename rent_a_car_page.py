@@ -1,9 +1,9 @@
 from PySide6 import QtWidgets, QtCore, QtGui
-from numpy.random import pareto
-
 from CSS import rent_a_car_window_css as css
 from pathlib import Path
 from database import db_service
+from itertools import groupby
+
 
 class RentACarWindow(QtWidgets.QLabel):
     def __init__(self, main_window):
@@ -16,13 +16,12 @@ class RentACarWindow(QtWidgets.QLabel):
 
         self.setFixedSize(
             user_screen_geometry.width(),
-            user_screen_geometry.height() - header.height()
+            user_screen_geometry.height() - header.height(),
         )
 
         self.car_options_side_menu = CarOptionsSideMenu(self)
 
         self.move(0, header.height())
-
 
 
 class CarOptionsSideMenu(QtWidgets.QLabel):
@@ -33,12 +32,11 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         windows_navbar_bottom_height = 25
 
         self.setFixedSize(
-            rent_a_car_window.width() * 1/3.5,
-            rent_a_car_window.height() - windows_navbar_bottom_height
+            rent_a_car_window.width() * 1 / 3,
+            rent_a_car_window.height() - windows_navbar_bottom_height,
         )
 
-        self.move(0,0)
-
+        self.move(0, 0)
 
         self.lbl_available_cars = QtWidgets.QLabel("Veículos disponíveis", parent=self)
         self.lbl_available_cars.setStyleSheet(css.car_options_side_menu_title)
@@ -60,14 +58,15 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         self.cars_grid_conteiner.setLayout(self.cars_grid)
         self.scroll_area.setWidget(self.cars_grid_conteiner)
 
-        for vehicle in db_service.get_all_vehicles():
-            vehicle_info_box = QtWidgets.QLabel(vehicle[4])
+        for vehicle in db_service.get_available_vehicles():
+            print(vehicle)
+            vehicle_info_box = QtWidgets.QLabel(
+                f"{vehicle[4]} {vehicle[3]}, {vehicle[5]}, placa {vehicle[6]}"
+            )
             vehicle_info_box.id = vehicle[0]
             vehicle_info_box.setStyleSheet(css.vehicle_info_box)
-            vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() -30, 80)
+            vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 30, 80)
+            vehicle_info_box.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            vehicle_info_box.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+
             self.cars_grid.addWidget(vehicle_info_box)
-
-
-
-
-

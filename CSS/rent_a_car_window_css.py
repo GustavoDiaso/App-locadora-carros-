@@ -11,7 +11,7 @@ car_options_side_menu = """
 """
 
 car_options_side_menu_title = """
-    font-size: 25px;
+    font-size: 22px;
     color: white;
     font-family: Segoe UI;
     font-weight: 500;
@@ -25,7 +25,10 @@ cars_grid_conteiner = """
 vehicle_info_box = """
     background-color: grey;
     border-radius: 10px;
-    color: blue;
+    color: white;S
+    font-family: Segoe UI;
+    font-size: 13px;
+    font-weight: 700;
 
 """
 

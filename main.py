@@ -48,7 +48,6 @@ if __name__ == "__main__":
     # because I am constantly changing the database.
     # db_service.recreate_sqlite_database(Path(__file__).parent / "database", "database")
 
-
     connection = sqlite3.connect(db_service.env_variables["DB_PATH"])
     db_service.set_connection(connection)
     db_service.create_table_drivers()
