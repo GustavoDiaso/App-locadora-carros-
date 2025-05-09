@@ -1,6 +1,5 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import css
-from dotenv import dotenv_values
 import sqlite3
 from pathlib import Path
 
@@ -10,7 +9,7 @@ import login_and_registration_page_widgets as lrwidgets
 import informative_popup as infpopup
 import driver_and_vehicle_objects
 import header
-import rent_a_car_window
+import rent_a_car_page
 
 
 class MainWindow(QtWidgets.QWidget):
@@ -41,19 +40,23 @@ class MainWindow(QtWidgets.QWidget):
         self.informative_popup = infpopup.InformativePopUp(parent=self)
 
         self.header = header.Header(main_window=self)
-        self.rent_a_car_window = rent_a_car_window.RentACarWindow(main_window=self)
+        self.rent_a_car_window = rent_a_car_page.RentACarWindow(main_window=self)
 
 
 if __name__ == "__main__":
     # Even if the database already exists, It will be recreated. this helps a lot
     # because I am constantly changing the database.
+    # db_service.recreate_sqlite_database(Path(__file__).parent / "database", "database")
 
-    db_service.recreate_sqlite_database(Path(__file__).parent / "database", "database")
 
     connection = sqlite3.connect(db_service.env_variables["DB_PATH"])
     db_service.set_connection(connection)
     db_service.create_table_drivers()
     db_service.create_table_vehicles()
+
+    # Lets add in the database some random cars I created in the driver_and_vehicle_objects module.
+    # for vehicle in driver_and_vehicle_objects.my_vehicle_collection:
+    #     db_service.register_new_vehicle(vehicle)
 
     app = QtWidgets.QApplication()
     main_window = MainWindow()

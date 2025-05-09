@@ -91,10 +91,9 @@ def create_table_vehicles():
             vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT,
             id_owner INTEGER,
             chassi_number TEXT UNIQUE NOT NULL,
-            year of manufacture INTEGER NOT NULL,
+            year_of_manufacture INTEGER NOT NULL,
             model TEXT NOT NULL,
             color TEXT NOT NULL,
-            vehicle_category TEXT NOT NULL,
             plate TEXT NOT NULL,
             car_return_location TEXT NOT NULL,
             FOREIGN KEY (id_owner) REFERENCES drivers(id)
@@ -237,3 +236,52 @@ def driver_login(cpf, password):
     cursor.close()
 
     return response
+
+def register_new_vehicle(vehicle):
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
+
+    cursor.execute(
+        f"""
+        INSERT INTO {env_variables["VEHICLES_TABLE_NAME"]} (
+            id_owner,
+            chassi_number,
+            year_of_manufacture,
+            model,
+            color,
+            plate,
+            car_return_location
+        ) VALUES (?,?,?,?,?,?,?)
+        """,
+        [
+            vehicle.id_owner,
+            vehicle.chassi_number,
+            vehicle.year_of_manufacture,
+            vehicle.model,
+            vehicle.color,
+            vehicle.plate,
+            vehicle.car_return_location
+        ]
+    )
+
+    _connection.commit()
+    cursor.close()
+
+def get_all_vehicles():
+    _check_connection()
+
+    global _connection
+    cursor = _connection.cursor()
+
+    vehicles = cursor.execute(
+        f"""
+        SELECT * FROM {env_variables["VEHICLES_TABLE_NAME"]}
+        """
+    ).fetchall()
+
+    _connection.commit()
+    cursor.close()
+
+    return vehicles

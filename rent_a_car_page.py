@@ -1,7 +1,9 @@
 from PySide6 import QtWidgets, QtCore, QtGui
+from numpy.random import pareto
+
 from CSS import rent_a_car_window_css as css
 from pathlib import Path
-
+from database import db_service
 
 class RentACarWindow(QtWidgets.QLabel):
     def __init__(self, main_window):
@@ -41,3 +43,31 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         self.lbl_available_cars = QtWidgets.QLabel("Veículos disponíveis", parent=self)
         self.lbl_available_cars.setStyleSheet(css.car_options_side_menu_title)
         self.lbl_available_cars.move(30, 30)
+
+        self.scroll_area = QtWidgets.QScrollArea(parent=self)
+        self.scroll_area.setFixedWidth(self.width() - 20)
+        self.scroll_area.setMinimumHeight(self.height() - 100)
+        self.scroll_area.move(10, 80)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.verticalScrollBar().setStyleSheet(css.scroll_bar)
+
+        self.cars_grid_conteiner = QtWidgets.QWidget(parent=self.scroll_area)
+        self.cars_grid_conteiner.setStyleSheet(css.cars_grid_conteiner)
+
+        self.cars_grid = QtWidgets.QVBoxLayout()
+        self.cars_grid.setSpacing(14)
+
+        self.cars_grid_conteiner.setLayout(self.cars_grid)
+        self.scroll_area.setWidget(self.cars_grid_conteiner)
+
+        for vehicle in db_service.get_all_vehicles():
+            vehicle_info_box = QtWidgets.QLabel(vehicle[4])
+            vehicle_info_box.id = vehicle[0]
+            vehicle_info_box.setStyleSheet(css.vehicle_info_box)
+            vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() -30, 80)
+            self.cars_grid.addWidget(vehicle_info_box)
+
+
+
+
+
