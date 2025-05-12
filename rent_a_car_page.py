@@ -1,8 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import rent_a_car_window_css as css
-from pathlib import Path
 from database import db_service
-from itertools import groupby
+
 
 
 class RentACarWindow(QtWidgets.QLabel):
@@ -58,15 +57,33 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         self.cars_grid_conteiner.setLayout(self.cars_grid)
         self.scroll_area.setWidget(self.cars_grid_conteiner)
 
+        self.vehicle_info_boxes = []
+
         for vehicle in db_service.get_available_vehicles():
             print(vehicle)
-            vehicle_info_box = QtWidgets.QLabel(
+            vehicle_info_box = QtWidgets.QPushButton(
                 f"{vehicle[4]} {vehicle[3]}, {vehicle[5]}, placa {vehicle[6]}"
             )
             vehicle_info_box.id = vehicle[0]
             vehicle_info_box.setStyleSheet(css.vehicle_info_box)
             vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 30, 80)
-            vehicle_info_box.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             vehicle_info_box.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+            vehicle_info_box.click = False
 
+            vehicle_info_box.clicked.connect(lambda signal, box=vehicle_info_box: self.vehicle_info_box_hover(box))
+
+            self.vehicle_info_boxes.append(vehicle_info_box)
             self.cars_grid.addWidget(vehicle_info_box)
+
+
+    def vehicle_info_box_hover(self, vehicle_info_box_target):
+        if not vehicle_info_box_target.click:
+            vehicle_info_box_target.setStyleSheet(css.vehicle_info_box_hover)
+            vehicle_info_box_target.click = True
+            print(vehicle_info_box_target.id)
+
+        else:
+            vehicle_info_box_target.setStyleSheet(css.vehicle_info_box)
+            vehicle_info_box_target.click = False
+            print('noi')
+

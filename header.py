@@ -20,12 +20,14 @@ class Header(QtWidgets.QLabel):
         self.logo.setFixedSize(100, 100)
         self.logo.move(50, self.height()//2 - self.logo.height()//2)
 
-        self.lbl_company_name = QtWidgets.QLabel("alugarapido.com",parent=self)
-        self.lbl_company_name.setStyleSheet(header_css.lbl_company_name)
-        self.lbl_company_name.setFixedWidth(len(self.lbl_company_name.text()) * 12)
-        self.lbl_company_name.move(
-            self.width() - self.lbl_company_name.width() - 50,
-            self.height() // 2 - self.lbl_company_name.height() // 2
+        self.lbl_logged_user_name = QtWidgets.QLabel(
+            f'Bem-vindo, {main_window.logged_in_user.full_name}',parent=self
+        )
+        self.lbl_logged_user_name.setStyleSheet(header_css.lbl_logged_user_name)
+        self.lbl_logged_user_name.setFixedWidth(len(self.lbl_logged_user_name.text()) * 12)
+        self.lbl_logged_user_name.move(
+            self.width() - self.lbl_logged_user_name.width() - 50,
+            self.height() // 2 - self.lbl_logged_user_name.height() // 2
         )
 
         self.header_options_section = QtWidgets.QLabel(parent=self)

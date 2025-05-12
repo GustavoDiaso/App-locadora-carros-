@@ -3,7 +3,7 @@ header = """
     
 """
 
-lbl_company_name = """
+lbl_logged_user_name = """
     color: white;
     font-size: 18px;
     font-family: Segoe UI;

@@ -31,6 +31,15 @@ vehicle_info_box = """
     font-weight: 700;
 
 """
+vehicle_info_box_hover = """
+    background-color: black;
+    border-radius: 10px;
+    color: white;S
+    font-family: Segoe UI;
+    font-size: 13px;
+    font-weight: 700;
+
+"""
 
 scroll_bar = """
     QScrollBar:vertical {
