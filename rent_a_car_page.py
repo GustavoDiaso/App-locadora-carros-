@@ -68,22 +68,21 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
             vehicle_info_box.setStyleSheet(css.vehicle_info_box)
             vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 30, 80)
             vehicle_info_box.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
-            vehicle_info_box.click = False
 
-            vehicle_info_box.clicked.connect(lambda signal, box=vehicle_info_box: self.vehicle_info_box_hover(box))
+            vehicle_info_box.enterEvent = (
+                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_enter(box)
+            )
+            vehicle_info_box.leaveEvent = (
+                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_leave(box)
+            )
 
             self.vehicle_info_boxes.append(vehicle_info_box)
             self.cars_grid.addWidget(vehicle_info_box)
 
 
-    def vehicle_info_box_hover(self, vehicle_info_box_target):
-        if not vehicle_info_box_target.click:
-            vehicle_info_box_target.setStyleSheet(css.vehicle_info_box_hover)
-            vehicle_info_box_target.click = True
-            print(vehicle_info_box_target.id)
 
-        else:
-            vehicle_info_box_target.setStyleSheet(css.vehicle_info_box)
-            vehicle_info_box_target.click = False
-            print('noi')
+    def vehicle_info_box_enter(self, vehicle_info_box_target):
+        vehicle_info_box_target.setStyleSheet(css.vehicle_info_box_enter)
 
+    def vehicle_info_box_leave(self, vehicle_info_box_target):
+        vehicle_info_box_target.setStyleSheet(css.vehicle_info_box)

@@ -23,23 +23,24 @@ cars_grid_conteiner = """
 """
 
 vehicle_info_box = """
-    background-color: grey;
+    background-color: #767676;
     border-radius: 10px;
-    color: white;S
+    color: white;
     font-family: Segoe UI;
     font-size: 13px;
     font-weight: 700;
 
 """
-vehicle_info_box_hover = """
-    background-color: black;
+vehicle_info_box_enter = """
+    background-color: #646464;
     border-radius: 10px;
-    color: white;S
+    color: white;
     font-family: Segoe UI;
     font-size: 13px;
     font-weight: 700;
-
 """
+
+
 
 scroll_bar = """
     QScrollBar:vertical {

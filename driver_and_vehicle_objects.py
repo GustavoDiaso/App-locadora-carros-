@@ -84,74 +84,74 @@ def gerar_placa_aleatoria():
         return f"{letras}{numeros}"
 
 
-my_vehicle_collection = []
-
-random_models = [
-    "Onix",
-    "HB20",
-    "Kwid",
-    "Mobi",
-    "Gol",
-    "Argo",
-    "Strada",
-    "Toro",
-    "Compass",
-    "Renegade",
-    "Creta",
-    "Tracker",
-    "Corolla",
-    "Civic",
-    "Hilux",
-]
-
-colors_exemple = [
-    "Preto",
-    "Branco",
-    "Prata",
-    "Cinza",
-    "Vermelho",
-    "Azul",
-    "Verde",
-    "Amarelo",
-]
-
-devolution_locations = [
-    "Aeroporto GIG",
-    "Aeroporto SDU",
-    "Centro RJ",
-    "Barra da Tijuca",
-    "Copacabana",
-    "Aeroporto GRU",
-    "Centro SP",
-    "Paulista",
-    "Aeroporto CNF",
-    "Centro BH",
-]
-
-number_of_vehicles = 35  # Criando X carros diferentes
-
-current_year = 2025  # Considerando o ano atual para o limite superior de fabricação
-
-for i in range(number_of_vehicles):
-    id_owner = random.randint(1000, 9999)  # ID do proprietário aleatório
-    chassi_number = gerar_chassi_aleatorio()
-    year_of_manufacture = random.randint(
-        1990, current_year
-    )  # Ano entre 1990 e o ano atual
-    model = random.choice(random_models)
-    color = random.choice(colors_exemple)
-    plate = gerar_placa_aleatoria()
-    car_return_location = random.choice(devolution_locations)
-    rented = random.choice([0, 1])
-
-    novo_veiculo = Vehicle(
-        id_owner=id_owner,
-        chassi_number=chassi_number,
-        year_of_manufacture=year_of_manufacture,
-        model=model,
-        color=color,
-        plate=plate,
-        car_return_location=car_return_location,
-        rented=rented,
-    )
-    my_vehicle_collection.append(novo_veiculo)
+# my_vehicle_collection = []
+#
+# random_models = [
+#     "Onix",
+#     "HB20",
+#     "Kwid",
+#     "Mobi",
+#     "Gol",
+#     "Argo",
+#     "Strada",
+#     "Toro",
+#     "Compass",
+#     "Renegade",
+#     "Creta",
+#     "Tracker",
+#     "Corolla",
+#     "Civic",
+#     "Hilux",
+# ]
+#
+# colors_exemple = [
+#     "Preto",
+#     "Branco",
+#     "Prata",
+#     "Cinza",
+#     "Vermelho",
+#     "Azul",
+#     "Verde",
+#     "Amarelo",
+# ]
+#
+# devolution_locations = [
+#     "Aeroporto GIG",
+#     "Aeroporto SDU",
+#     "Centro RJ",
+#     "Barra da Tijuca",
+#     "Copacabana",
+#     "Aeroporto GRU",
+#     "Centro SP",
+#     "Paulista",
+#     "Aeroporto CNF",
+#     "Centro BH",
+# ]
+#
+# number_of_vehicles = 35  # Criando X carros diferentes
+#
+# current_year = 2025  # Considerando o ano atual para o limite superior de fabricação
+#
+# for i in range(number_of_vehicles):
+#     id_owner = random.randint(1000, 9999)  # ID do proprietário aleatório
+#     chassi_number = gerar_chassi_aleatorio()
+#     year_of_manufacture = random.randint(
+#         1990, current_year
+#     )  # Ano entre 1990 e o ano atual
+#     model = random.choice(random_models)
+#     color = random.choice(colors_exemple)
+#     plate = gerar_placa_aleatoria()
+#     car_return_location = random.choice(devolution_locations)
+#     rented = random.choice([0, 1])
+#
+#     novo_veiculo = Vehicle(
+#         id_owner=id_owner,
+#         chassi_number=chassi_number,
+#         year_of_manufacture=year_of_manufacture,
+#         model=model,
+#         color=color,
+#         plate=plate,
+#         car_return_location=car_return_location,
+#         rented=rented,
+#     )
+#     my_vehicle_collection.append(novo_veiculo)
