@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Importing our modules
 from database import db_service
-import driver_and_vehicle_objects
+import key_classes
 
 class LoginAndRegistrationWindow(QtWidgets.QLabel):
     def __init__(self, parent):

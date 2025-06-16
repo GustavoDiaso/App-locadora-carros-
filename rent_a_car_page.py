@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import rent_a_car_window_css as css
+from CSS.rent_a_car_window_css import rent_a_car_window, vehicle_info_box
 from database import db_service
-
 
 
 class RentACarWindow(QtWidgets.QLabel):
@@ -18,9 +18,12 @@ class RentACarWindow(QtWidgets.QLabel):
             user_screen_geometry.height() - header.height(),
         )
 
-        self.car_options_side_menu = CarOptionsSideMenu(self)
-
         self.move(0, header.height())
+
+        self.car_options_side_menu = CarOptionsSideMenu(self)
+        self.car_infomations_view = CarInformationsView(self)
+
+
 
 
 class CarOptionsSideMenu(QtWidgets.QLabel):
@@ -32,10 +35,13 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
 
         self.setFixedSize(
             rent_a_car_window.width() * 1 / 3,
-            rent_a_car_window.height() - windows_navbar_bottom_height,
+            rent_a_car_window.height() - windows_navbar_bottom_height
         )
 
-        self.move(0, 0)
+        self.move(
+            rent_a_car_window.width() // 2 - self.width() - 150,
+            0
+        )
 
         self.lbl_available_cars = QtWidgets.QLabel("Veículos disponíveis", parent=self)
         self.lbl_available_cars.setStyleSheet(css.car_options_side_menu_title)
@@ -50,11 +56,10 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
 
         self.cars_grid_conteiner = QtWidgets.QWidget(parent=self.scroll_area)
         self.cars_grid_conteiner.setStyleSheet(css.cars_grid_conteiner)
-
         self.cars_grid = QtWidgets.QVBoxLayout()
         self.cars_grid.setSpacing(14)
-
         self.cars_grid_conteiner.setLayout(self.cars_grid)
+        self.cars_grid_conteiner.setFixedWidth(self.scroll_area.width() - 40)
         self.scroll_area.setWidget(self.cars_grid_conteiner)
 
         self.vehicle_info_boxes = []
@@ -66,7 +71,7 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
             )
             vehicle_info_box.id = vehicle[0]
             vehicle_info_box.setStyleSheet(css.vehicle_info_box)
-            vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 30, 80)
+            vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 20, 80)
             vehicle_info_box.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
 
             vehicle_info_box.enterEvent = (
@@ -79,6 +84,7 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
             self.vehicle_info_boxes.append(vehicle_info_box)
             self.cars_grid.addWidget(vehicle_info_box)
 
+            self.resize_object_based_on_window_size()
 
 
     def vehicle_info_box_enter(self, vehicle_info_box_target):
@@ -86,3 +92,36 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
 
     def vehicle_info_box_leave(self, vehicle_info_box_target):
         vehicle_info_box_target.setStyleSheet(css.vehicle_info_box)
+
+    def resize_object_based_on_window_size(self):
+        rent_a_car_window_width = self.parent().width()
+
+        if rent_a_car_window_width <= 1280:
+            self.setFixedWidth(
+                rent_a_car_window_width // 2 - 150,
+            )
+            self.move(0,0)
+            self.scroll_area.setFixedWidth(self.width() - 20)
+            self.cars_grid_conteiner.setFixedWidth(self.scroll_area.width() - 40)
+
+            for vehicle_info_box in self.vehicle_info_boxes:
+                vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 20, 80)
+
+
+
+
+class CarInformationsView(QtWidgets.QLabel):
+    def __init__(self, rent_a_car_window):
+        super(CarInformationsView, self).__init__(parent=rent_a_car_window)
+        windows_navbar_bottom_height = 25
+
+        self.setStyleSheet(css.car_informations_view)
+
+        self.setFixedSize(600, rent_a_car_window.height() * 0.8)
+
+        self.move(
+            rent_a_car_window.car_options_side_menu.x() + rent_a_car_window.car_options_side_menu.width() + 150,
+            rent_a_car_window.height()//2 - self.height()//2 - windows_navbar_bottom_height
+        )
+
+

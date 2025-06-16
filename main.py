@@ -7,7 +7,7 @@ from pathlib import Path
 import database.db_service as db_service
 import login_and_registration_page_widgets as lrwidgets
 import informative_popup as infpopup
-import driver_and_vehicle_objects
+import key_classes
 import header
 import rent_a_car_page
 
@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QWidget):
         user_screen_geometry = user_screen.availableGeometry()
         self.setMinimumSize(user_screen_geometry.width(), user_screen_geometry.height())
 
-        self.logged_in_user = driver_and_vehicle_objects.Driver(
+        self.logged_in_user = key_classes.Driver(
             full_name="Nomefalso Johnson",
             cpf="98765432109",
             birth_date="19/06/2004",
