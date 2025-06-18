@@ -66,5 +66,9 @@ scroll_bar = """
 """
 
 car_informations_view = """
-    background-color: blue;
+    background-color: #484848;
+"""
+
+lbl_car_info = """
+
 """

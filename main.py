@@ -56,7 +56,8 @@ if __name__ == "__main__":
     db_service.create_table_vehicles()
 
     # Lets add in the database some random cars I created in the driver_and_vehicle_objects module.
-    # for vehicle in driver_and_vehicle_objects.my_vehicle_collection:
+    # db_service.clear_table('vehicles')
+    # for vehicle in key_classes.my_vehicle_collection:
     #     db_service.register_new_vehicle(vehicle)
 
     app = QtWidgets.QApplication()

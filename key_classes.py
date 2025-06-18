@@ -65,44 +65,44 @@ class Vehicle:
         self.car_return_location = car_return_location
         self.rented = rented
 
-
-# Função para gerar um número de chassi aleatório (simplificado)
-def gerar_chassi_aleatorio(length=17):
-    return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))
-
-
-# Função para gerar uma placa aleatória no formato Mercosul (LLLNLNN) ou antigo (LLLNNNN)
-def gerar_placa_aleatoria():
-    if random.choice([True, False]):  # Formato Mercosul (aproximado)
-        letras1 = "".join(random.choices(string.ascii_uppercase, k=3))
-        numero1 = random.randint(0, 9)
-        letra2 = random.choice(string.ascii_uppercase)
-        numeros2 = "".join(random.choices(string.digits, k=2))
-        return f"{letras1}{numero1}{letra2}{numeros2}"
-    else:  # Formato antigo
-        letras = "".join(random.choices(string.ascii_uppercase, k=3))
-        numeros = "".join(random.choices(string.digits, k=4))
-        return f"{letras}{numeros}"
-
-
+#
+# # Função para gerar um número de chassi aleatório (simplificado)
+# def gerar_chassi_aleatorio(length=17):
+#     return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))
+#
+#
+# # Função para gerar uma placa aleatória no formato Mercosul (LLLNLNN) ou antigo (LLLNNNN)
+# def gerar_placa_aleatoria():
+#     if random.choice([True, False]):  # Formato Mercosul (aproximado)
+#         letras1 = "".join(random.choices(string.ascii_uppercase, k=3))
+#         numero1 = random.randint(0, 9)
+#         letra2 = random.choice(string.ascii_uppercase)
+#         numeros2 = "".join(random.choices(string.digits, k=2))
+#         return f"{letras1}{numero1}{letra2}{numeros2}"
+#     else:  # Formato antigo
+#         letras = "".join(random.choices(string.ascii_uppercase, k=3))
+#         numeros = "".join(random.choices(string.digits, k=4))
+#         return f"{letras}{numeros}"
+#
+#
 # my_vehicle_collection = []
 #
 # random_models = [
-#     "Onix",
-#     "HB20",
-#     "Kwid",
-#     "Mobi",
-#     "Gol",
-#     "Argo",
-#     "Strada",
-#     "Toro",
-#     "Compass",
-#     "Renegade",
-#     "Creta",
-#     "Tracker",
-#     "Corolla",
-#     "Civic",
-#     "Hilux",
+#     "Chevrolet Onix",
+#     "Hyundai HB20",
+#     "Renault Kwid",
+#     "Fiat Mobi",
+#     "Volkswagen Gol",
+#     "Fiat Argo",
+#     "Fiat Strada",
+#     "Fiat Toro",
+#     "Jeep Compass",
+#     "Jeep Renegade",
+#     "Hyundai Creta",
+#     "Chevrolet Tracker",
+#     "Toyota Corolla",
+#     "Honda Civic",
+#     "Toyota Hilux",
 # ]
 #
 # colors_exemple = [
@@ -117,15 +117,15 @@ def gerar_placa_aleatoria():
 # ]
 #
 # devolution_locations = [
-#     "Aeroporto GIG",
-#     "Aeroporto SDU",
-#     "Centro RJ",
-#     "Barra da Tijuca",
-#     "Copacabana",
-#     "Aeroporto GRU",
+#     "Centro Aeroporto GIG",
+#     "Centro Aeroporto SDU",
+#     "Centro SC",
 #     "Centro SP",
-#     "Paulista",
-#     "Aeroporto CNF",
+#     "Centro Copacabana",
+#     "Centro Aeroporto Guarulhos",
+#     "Centro SP",
+#     "Centro Paulista",
+#     "Centro Aeroporto CNF",
 #     "Centro BH",
 # ]
 #
@@ -143,7 +143,7 @@ def gerar_placa_aleatoria():
 #     color = random.choice(colors_exemple)
 #     plate = gerar_placa_aleatoria()
 #     car_return_location = random.choice(devolution_locations)
-#     rented = random.choice([0, 1])
+#     rented = random.choice((0,1,1))
 #
 #     novo_veiculo = Vehicle(
 #         id_owner=id_owner,
