@@ -17,7 +17,9 @@ class MainWindow(QtWidgets.QWidget):
         super(MainWindow, self).__init__()
         self.setStyleSheet(css.main_window)
         self.setWindowTitle("app locarápido")
-        self.setWindowIcon(QtGui.QPixmap(Path(__file__).parent / 'images/CompanyLogo.png'))
+        self.setWindowIcon(
+            QtGui.QPixmap(Path(__file__).parent / "images/CompanyLogo.png")
+        )
 
         user_screen = QtGui.QGuiApplication.primaryScreen()
         user_screen_geometry = user_screen.availableGeometry()

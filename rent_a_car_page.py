@@ -4,6 +4,7 @@ from CSS.rent_a_car_window_css import vehicle_info_box
 from database import db_service
 from pathlib import Path
 
+
 class RentACarWindow(QtWidgets.QLabel):
     def __init__(self, main_window):
         super(RentACarWindow, self).__init__(parent=main_window)
@@ -24,8 +25,6 @@ class RentACarWindow(QtWidgets.QLabel):
         self.car_infomations_view = CarInformationsView(self)
 
 
-
-
 class CarOptionsSideMenu(QtWidgets.QLabel):
     def __init__(self, rent_a_car_window):
         super(CarOptionsSideMenu, self).__init__(parent=rent_a_car_window)
@@ -34,13 +33,13 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         windows_navbar_bottom_height = 25
 
         self.setFixedSize(
-            rent_a_car_window.width() * 1 / 3,
-            rent_a_car_window.height() - 125
+            rent_a_car_window.width() * 1 / 3, rent_a_car_window.height() - 125
         )
 
         self.move(
             rent_a_car_window.width() // 4 - self.width() // 2,
-            (rent_a_car_window.height() - windows_navbar_bottom_height) // 2 - self.height() // 2
+            (rent_a_car_window.height() - windows_navbar_bottom_height) // 2
+            - self.height() // 2,
         )
 
         self.lbl_available_cars = QtWidgets.QLabel("Veículos disponíveis", parent=self)
@@ -68,15 +67,15 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
                 f"{vehicle[4]} {vehicle[3]}, {vehicle[5]}"
             )
             vehicle_info_box.info = {
-                'id': vehicle[0],
-                'id_owner': vehicle[1],
-                'chassi_number': vehicle[2],
-                'year_of_manufacture': vehicle[3],
-                'model': vehicle[4],
-                'color': vehicle[5],
-                'plate': vehicle[6],
-                'car_return_location': vehicle[7],
-                'rented': vehicle[8]
+                "id": vehicle[0],
+                "id_owner": vehicle[1],
+                "chassi_number": vehicle[2],
+                "year_of_manufacture": vehicle[3],
+                "model": vehicle[4],
+                "color": vehicle[5],
+                "plate": vehicle[6],
+                "car_return_location": vehicle[7],
+                "rented": vehicle[8],
             }
 
             vehicle_info_box.setStyleSheet(css.vehicle_info_box)
@@ -84,18 +83,23 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
             vehicle_info_box.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
 
             vehicle_info_box.enterEvent = (
-                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_enter(box)
+                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_enter(
+                    box
+                )
             )
             vehicle_info_box.leaveEvent = (
-                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_leave(box)
+                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_leave(
+                    box
+                )
             )
             vehicle_info_box.clicked.connect(
-                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_clicked(box)
+                lambda mouse_event, box=vehicle_info_box: self.vehicle_info_box_clicked(
+                    box
+                )
             )
 
             self.cars_grid.addWidget(vehicle_info_box)
             self.resize_object_based_on_window_size()
-
 
     def vehicle_info_box_enter(self, vehicle_info_box_target):
         vehicle_info_box_target.setStyleSheet(css.vehicle_info_box_enter)
@@ -117,7 +121,8 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
 
             self.move(
                 rent_a_car_window_.width() // 4 - self.width() // 2,
-                (rent_a_car_window_.height() - windows_navbar_bottom_height_) // 2 - self.height() // 2
+                (rent_a_car_window_.height() - windows_navbar_bottom_height_) // 2
+                - self.height() // 2,
             )
 
             self.scroll_area.setFixedWidth(self.width() - 20)
@@ -127,7 +132,9 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
                 item = self.cars_grid.itemAt(i)
                 if item.widget() is not None:
                     vehicle_info_box = item.widget()
-                    vehicle_info_box.setFixedSize(self.cars_grid_conteiner.width() - 20, 80)
+                    vehicle_info_box.setFixedSize(
+                        self.cars_grid_conteiner.width() - 20, 80
+                    )
 
 
 class CarInformationsView(QtWidgets.QLabel):
@@ -136,53 +143,55 @@ class CarInformationsView(QtWidgets.QLabel):
 
         default_font = QtGui.QFont()
         default_font.setFamily("Segoe UI")
-        default_font.setPixelSize(24)
+        default_font.setPixelSize(20)
         windows_navbar_bottom_height = 25
 
         self.setStyleSheet(css.car_informations_view)
 
         self.setFixedSize(rent_a_car_window.width() // 2, rent_a_car_window.height())
 
-        self.move(
-            rent_a_car_window.width() // 2,
-            0
-        )
+        self.move(rent_a_car_window.width() // 2, 0)
 
         self.informations_section = QtWidgets.QLabel(parent=self)
-        self.informations_section.setFixedWidth(
-            self.width()
-        )
+        self.informations_section.setFixedWidth(self.width())
         self.informations_section.setStyleSheet(css.informations_section)
 
         self.car_image = QtWidgets.QLabel(parent=self.informations_section)
-        self.car_image.setPixmap(
-            QtGui.QPixmap(Path(__file__).parent / 'images/3d-car.png').scaled(250, 225)
-        )
-        self.car_image.move(
-            self.width()//2 - self.car_image.pixmap().width()//2,
-            0
-        )
+        self.car_image.setFixedSize(self.informations_section.width(), 200)
 
-        self.lbl_car_name = QtWidgets.QLabel("O nome do carro vai aqui", parent=self.informations_section)
+        self.car_image.setPixmap(
+            QtGui.QPixmap(Path(__file__).parent / "images/3d-car.png").scaled(
+                self.car_image.width(), self.car_image.height()
+            )
+        )
+        self.car_image.move(self.width() // 2 - self.car_image.pixmap().width() // 2, 0)
+
+        self.lbl_car_name = QtWidgets.QLabel(
+            "O nome do carro vai aqui", parent=self.informations_section
+        )
         self.lbl_car_name.setStyleSheet(css.lbl_car_info)
         self.lbl_car_name.setFont(default_font)
         self.lbl_car_name.setFixedWidth(
             QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_name.text())
         )
         self.lbl_car_name.move(
-            self.width()//2 - self.lbl_car_name.width()//2,
-            self.car_image.y() + self.car_image.pixmap().height() + 20
+            self.width() // 2 - self.lbl_car_name.width() // 2,
+            self.car_image.y() + self.car_image.pixmap().height() + 20,
         )
 
-        self.lbl_car_color = QtWidgets.QLabel("Cor da pintura: Default", parent=self.informations_section)
+        self.lbl_car_color = QtWidgets.QLabel(
+            "Cor da pintura: Default", parent=self.informations_section
+        )
         self.lbl_car_color.setStyleSheet(css.lbl_car_info)
         self.lbl_car_color.setFont(default_font)
         self.lbl_car_color.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_color.text())
+            QtGui.QFontMetrics(default_font).horizontalAdvance(
+                self.lbl_car_color.text()
+            )
         )
         self.lbl_car_color.move(
-            self.width()//2 - self.lbl_car_color.width()//2,
-            self.lbl_car_name.y() + self.lbl_car_name.height() + 20
+            self.width() // 2 - self.lbl_car_color.width() // 2,
+            self.lbl_car_name.y() + self.lbl_car_name.height() + 20,
         )
 
         self.lbl_car_year = QtWidgets.QLabel("2025", parent=self.informations_section)
@@ -192,38 +201,46 @@ class CarInformationsView(QtWidgets.QLabel):
             QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_year.text())
         )
         self.lbl_car_year.move(
-            self.width()//2 - self.lbl_car_year.width()//2,
-            self.lbl_car_color.y() + self.lbl_car_color.height() + 20
+            self.width() // 2 - self.lbl_car_year.width() // 2,
+            self.lbl_car_color.y() + self.lbl_car_color.height() + 20,
         )
 
-        self.lbl_car_plate = QtWidgets.QLabel("Placa:", parent=self.informations_section)
+        self.lbl_car_plate = QtWidgets.QLabel(
+            "Placa:", parent=self.informations_section
+        )
         self.lbl_car_plate.setStyleSheet(css.lbl_car_info)
         self.lbl_car_plate.setFont(default_font)
         self.lbl_car_plate.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_plate.text())
+            QtGui.QFontMetrics(default_font).horizontalAdvance(
+                self.lbl_car_plate.text()
+            )
         )
         self.lbl_car_plate.move(
-            self.width()//2 - self.lbl_car_plate.width()//2,
-            self.lbl_car_year.y() + self.lbl_car_year.height() + 20
+            self.width() // 2 - self.lbl_car_plate.width() // 2,
+            self.lbl_car_year.y() + self.lbl_car_year.height() + 20,
         )
 
-        self.lbl_car_return_location = QtWidgets.QLabel("Localização:", parent=self.informations_section)
+        self.lbl_car_return_location = QtWidgets.QLabel(
+            "Localização:", parent=self.informations_section
+        )
         self.lbl_car_return_location.setStyleSheet(css.lbl_car_info)
         self.lbl_car_return_location.setFont(default_font)
         self.lbl_car_return_location.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_return_location.text())
+            QtGui.QFontMetrics(default_font).horizontalAdvance(
+                self.lbl_car_return_location.text()
+            )
         )
         self.lbl_car_return_location.move(
-            self.width()//2 - self.lbl_car_return_location.width()//2,
-            self.lbl_car_plate.y() + self.lbl_car_plate.height() + 20
+            self.width() // 2 - self.lbl_car_return_location.width() // 2,
+            self.lbl_car_plate.y() + self.lbl_car_plate.height() + 20,
         )
 
         self.informations_section.setFixedHeight(
-            self.car_image.pixmap().height() +
-            self.lbl_car_color.height() * 5 +
-            20 * 5
+            self.car_image.pixmap().height() + self.lbl_car_color.height() * 5 + 20 * 5
         )
         self.informations_section.move(
-            self.width()//2 - self.informations_section.width() // 2,
-            self.height()//2 - self.informations_section.height() // 2 - windows_navbar_bottom_height
+            self.width() // 2 - self.informations_section.width() // 2,
+            self.height() // 2
+            - self.informations_section.height() // 2
+            - windows_navbar_bottom_height,
         )
