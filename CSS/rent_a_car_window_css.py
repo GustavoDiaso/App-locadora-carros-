@@ -72,3 +72,7 @@ car_informations_view = """
 lbl_car_info = """
 
 """
+
+informations_section = """
+    
+"""
