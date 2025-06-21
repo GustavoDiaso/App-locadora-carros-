@@ -41,7 +41,6 @@ vehicle_info_box_enter = """
 """
 
 
-
 scroll_bar = """
     QScrollBar:vertical {
         width: 12px;
@@ -70,7 +69,7 @@ car_informations_view = """
 """
 
 lbl_car_info = """
-
+    background-color: blue;
 """
 
 informations_section = """

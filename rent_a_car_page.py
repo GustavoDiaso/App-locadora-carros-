@@ -1,8 +1,8 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import rent_a_car_window_css as css
-from CSS.rent_a_car_window_css import vehicle_info_box
 from database import db_service
 from pathlib import Path
+from interesting_functions import set_correct_lbl_width
 
 
 class RentACarWindow(QtWidgets.QLabel):
@@ -22,7 +22,7 @@ class RentACarWindow(QtWidgets.QLabel):
         self.move(0, header.height())
 
         self.car_options_side_menu = CarOptionsSideMenu(self)
-        self.car_infomations_view = CarInformationsView(self)
+        self.car_informations_view = CarInformationsView(self)
 
 
 class CarOptionsSideMenu(QtWidgets.QLabel):
@@ -108,7 +108,40 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         vehicle_info_box_target.setStyleSheet(css.vehicle_info_box)
 
     def vehicle_info_box_clicked(self, vehicle_info_box_target):
+
         print(vehicle_info_box_target.info)
+        car_informations_view = self.parent().car_informations_view
+        informations_section = car_informations_view.informations_section
+
+        lbl_car_name: QtWidgets.QLabel = car_informations_view.lbl_car_name
+        lbl_car_color: QtWidgets.QLabel = car_informations_view.lbl_car_color
+        lbl_car_year: QtWidgets.QLabel = car_informations_view.lbl_car_year
+        lbl_car_plate: QtWidgets.QLabel = car_informations_view.lbl_car_plate
+        lbl_car_return_location: QtWidgets.QLabel = (
+            car_informations_view.lbl_car_return_location
+        )
+
+        if not informations_section.isVisible():
+            informations_section.setVisible(True)
+
+        lbl_car_name.setText(vehicle_info_box_target.info["model"])
+        set_correct_lbl_width(lbl_car_name)
+        lbl_car_name.move(
+            informations_section.width() // 2 - lbl_car_name.width() // 2,
+            car_informations_view.car_image.y()
+            + car_informations_view.car_image.pixmap().height()
+            + 20,
+        )
+
+        lbl_car_color.setText(vehicle_info_box_target.info["color"])
+        set_correct_lbl_width(lbl_car_color)
+        lbl_car_color.move(
+            informations_section.width() // 2 - lbl_car_color.width() // 2,
+            lbl_car_name.y() + lbl_car_name.height() + 20,
+        )
+
+        lbl_car_year.setText(str(vehicle_info_box_target.info["year_of_manufacture"]))
+        set_correct_lbl_width(lbl_car_name)
 
     def resize_object_based_on_window_size(self):
         rent_a_car_window_ = self.parent()
@@ -140,7 +173,6 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
 class CarInformationsView(QtWidgets.QLabel):
     def __init__(self, rent_a_car_window):
         super(CarInformationsView, self).__init__(parent=rent_a_car_window)
-
         default_font = QtGui.QFont()
         default_font.setFamily("Segoe UI")
         default_font.setPixelSize(20)
@@ -153,29 +185,28 @@ class CarInformationsView(QtWidgets.QLabel):
         self.move(rent_a_car_window.width() // 2, 0)
 
         self.informations_section = QtWidgets.QLabel(parent=self)
-        self.informations_section.setFixedWidth(self.width())
+        self.informations_section.setFixedWidth(500)
         self.informations_section.setStyleSheet(css.informations_section)
 
         self.car_image = QtWidgets.QLabel(parent=self.informations_section)
-        self.car_image.setFixedSize(self.informations_section.width(), 200)
-
+        self.car_image.setFixedSize(self.width() // 3.5, self.height() // 4)
         self.car_image.setPixmap(
             QtGui.QPixmap(Path(__file__).parent / "images/3d-car.png").scaled(
                 self.car_image.width(), self.car_image.height()
             )
         )
-        self.car_image.move(self.width() // 2 - self.car_image.pixmap().width() // 2, 0)
+        self.car_image.move(
+            self.informations_section.width() // 2 - self.car_image.width() // 2, 0
+        )
 
         self.lbl_car_name = QtWidgets.QLabel(
             "O nome do carro vai aqui", parent=self.informations_section
         )
         self.lbl_car_name.setStyleSheet(css.lbl_car_info)
         self.lbl_car_name.setFont(default_font)
-        self.lbl_car_name.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_name.text())
-        )
+        set_correct_lbl_width(self.lbl_car_name)
         self.lbl_car_name.move(
-            self.width() // 2 - self.lbl_car_name.width() // 2,
+            self.informations_section.width() // 2 - self.lbl_car_name.width() // 2,
             self.car_image.y() + self.car_image.pixmap().height() + 20,
         )
 
@@ -184,24 +215,18 @@ class CarInformationsView(QtWidgets.QLabel):
         )
         self.lbl_car_color.setStyleSheet(css.lbl_car_info)
         self.lbl_car_color.setFont(default_font)
-        self.lbl_car_color.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(
-                self.lbl_car_color.text()
-            )
-        )
+        set_correct_lbl_width(self.lbl_car_color)
         self.lbl_car_color.move(
-            self.width() // 2 - self.lbl_car_color.width() // 2,
+            self.informations_section.width() // 2 - self.lbl_car_color.width() // 2,
             self.lbl_car_name.y() + self.lbl_car_name.height() + 20,
         )
 
         self.lbl_car_year = QtWidgets.QLabel("2025", parent=self.informations_section)
         self.lbl_car_year.setStyleSheet(css.lbl_car_info)
         self.lbl_car_year.setFont(default_font)
-        self.lbl_car_year.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(self.lbl_car_year.text())
-        )
+        set_correct_lbl_width(self.lbl_car_year)
         self.lbl_car_year.move(
-            self.width() // 2 - self.lbl_car_year.width() // 2,
+            self.informations_section.width() // 2 - self.lbl_car_year.width() // 2,
             self.lbl_car_color.y() + self.lbl_car_color.height() + 20,
         )
 
@@ -210,13 +235,9 @@ class CarInformationsView(QtWidgets.QLabel):
         )
         self.lbl_car_plate.setStyleSheet(css.lbl_car_info)
         self.lbl_car_plate.setFont(default_font)
-        self.lbl_car_plate.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(
-                self.lbl_car_plate.text()
-            )
-        )
+        set_correct_lbl_width(self.lbl_car_plate)
         self.lbl_car_plate.move(
-            self.width() // 2 - self.lbl_car_plate.width() // 2,
+            self.informations_section.width() // 2 - self.lbl_car_plate.width() // 2,
             self.lbl_car_year.y() + self.lbl_car_year.height() + 20,
         )
 
@@ -225,13 +246,10 @@ class CarInformationsView(QtWidgets.QLabel):
         )
         self.lbl_car_return_location.setStyleSheet(css.lbl_car_info)
         self.lbl_car_return_location.setFont(default_font)
-        self.lbl_car_return_location.setFixedWidth(
-            QtGui.QFontMetrics(default_font).horizontalAdvance(
-                self.lbl_car_return_location.text()
-            )
-        )
+        set_correct_lbl_width(self.lbl_car_return_location)
         self.lbl_car_return_location.move(
-            self.width() // 2 - self.lbl_car_return_location.width() // 2,
+            self.informations_section.width() // 2
+            - self.lbl_car_return_location.width() // 2,
             self.lbl_car_plate.y() + self.lbl_car_plate.height() + 20,
         )
 
@@ -244,3 +262,4 @@ class CarInformationsView(QtWidgets.QLabel):
             - self.informations_section.height() // 2
             - windows_navbar_bottom_height,
         )
+        self.informations_section.setVisible(False)
