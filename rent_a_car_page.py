@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from CSS import rent_a_car_window_css as css
+from CSS.rent_a_car_window_css import divisory
 from database import db_service
 from pathlib import Path
 from interesting_functions import set_correct_lbl_width
@@ -113,35 +114,34 @@ class CarOptionsSideMenu(QtWidgets.QLabel):
         car_informations_view = self.parent().car_informations_view
         informations_section = car_informations_view.informations_section
 
-        lbl_car_name: QtWidgets.QLabel = car_informations_view.lbl_car_name
-        lbl_car_color: QtWidgets.QLabel = car_informations_view.lbl_car_color
-        lbl_car_year: QtWidgets.QLabel = car_informations_view.lbl_car_year
-        lbl_car_plate: QtWidgets.QLabel = car_informations_view.lbl_car_plate
-        lbl_car_return_location: QtWidgets.QLabel = (
+        lbl_car_name_: QtWidgets.QLabel = car_informations_view.lbl_car_name
+        divisory_: QtWidgets.QLabel = car_informations_view.divisory
+        lbl_car_color_: QtWidgets.QLabel = car_informations_view.lbl_car_color
+        lbl_car_year_: QtWidgets.QLabel = car_informations_view.lbl_car_year
+        lbl_car_plate_: QtWidgets.QLabel = car_informations_view.lbl_car_plate
+        lbl_car_return_location_: QtWidgets.QLabel = (
             car_informations_view.lbl_car_return_location
         )
 
         if not informations_section.isVisible():
             informations_section.setVisible(True)
 
-        lbl_car_name.setText(vehicle_info_box_target.info["model"])
-        set_correct_lbl_width(lbl_car_name)
-        lbl_car_name.move(
-            informations_section.width() // 2 - lbl_car_name.width() // 2,
-            car_informations_view.car_image.y()
-            + car_informations_view.car_image.pixmap().height()
-            + 20,
+        lbl_car_name_.setText(vehicle_info_box_target.info["model"])
+        set_correct_lbl_width(lbl_car_name_)
+        lbl_car_name_.move(
+            informations_section.width() // 2 - lbl_car_name_.width() // 2,
+            divisory_.y() + divisory_.height() + 20,
         )
 
-        lbl_car_color.setText(vehicle_info_box_target.info["color"])
-        set_correct_lbl_width(lbl_car_color)
-        lbl_car_color.move(
-            informations_section.width() // 2 - lbl_car_color.width() // 2,
-            lbl_car_name.y() + lbl_car_name.height() + 20,
+        lbl_car_color_.setText(vehicle_info_box_target.info["color"])
+        set_correct_lbl_width(lbl_car_color_)
+        lbl_car_color_.move(
+            informations_section.width() // 2 - lbl_car_color_.width() // 2,
+            lbl_car_name_.y() + lbl_car_name_.height() + 20,
         )
 
-        lbl_car_year.setText(str(vehicle_info_box_target.info["year_of_manufacture"]))
-        set_correct_lbl_width(lbl_car_name)
+        lbl_car_year_.setText(str(vehicle_info_box_target.info["year_of_manufacture"]))
+        set_correct_lbl_width(lbl_car_name_)
 
     def resize_object_based_on_window_size(self):
         rent_a_car_window_ = self.parent()
@@ -187,8 +187,10 @@ class CarInformationsView(QtWidgets.QLabel):
         self.informations_section = QtWidgets.QLabel(parent=self)
         self.informations_section.setFixedWidth(500)
         self.informations_section.setStyleSheet(css.informations_section)
+        self.informations_section.border_size = 20
 
         self.car_image = QtWidgets.QLabel(parent=self.informations_section)
+        self.car_image.setStyleSheet(css.car_image)
         self.car_image.setFixedSize(self.width() // 3.5, self.height() // 4)
         self.car_image.setPixmap(
             QtGui.QPixmap(Path(__file__).parent / "images/3d-car.png").scaled(
@@ -196,7 +198,19 @@ class CarInformationsView(QtWidgets.QLabel):
             )
         )
         self.car_image.move(
-            self.informations_section.width() // 2 - self.car_image.width() // 2, 0
+            self.informations_section.width() // 2 - self.car_image.width() // 2,
+            self.informations_section.border_size
+        )
+
+        self.divisory = QtWidgets.QLabel(parent=self.informations_section)
+        self.divisory.setStyleSheet(css.divisory)
+        self.divisory.setFixedSize(
+            self.informations_section.width() - 40,
+            3
+        )
+        self.divisory.move(
+            self.informations_section.width() // 2 - self.divisory.width() // 2,
+            self.car_image.y() + self.car_image.pixmap().height() + 20
         )
 
         self.lbl_car_name = QtWidgets.QLabel(
@@ -207,7 +221,7 @@ class CarInformationsView(QtWidgets.QLabel):
         set_correct_lbl_width(self.lbl_car_name)
         self.lbl_car_name.move(
             self.informations_section.width() // 2 - self.lbl_car_name.width() // 2,
-            self.car_image.y() + self.car_image.pixmap().height() + 20,
+            self.divisory.y() + self.divisory.height() + 20,
         )
 
         self.lbl_car_color = QtWidgets.QLabel(
@@ -253,9 +267,30 @@ class CarInformationsView(QtWidgets.QLabel):
             self.lbl_car_plate.y() + self.lbl_car_plate.height() + 20,
         )
 
-        self.informations_section.setFixedHeight(
-            self.car_image.pixmap().height() + self.lbl_car_color.height() * 5 + 20 * 5
+        self.btn_alugar_carro = QtWidgets.QPushButton("Alugar carro", parent=self.informations_section)
+        self.btn_alugar_carro.setStyleSheet(css.btn_alugar_carro)
+        self.btn_alugar_carro.setFixedSize(
+            self.informations_section.width() - 40,
+            60
         )
+        self.btn_alugar_carro.move(
+            self.informations_section.width() // 2
+            - self.btn_alugar_carro.width() // 2,
+            self.lbl_car_return_location.y() + self.lbl_car_return_location.height() + 20
+        )
+        self.btn_alugar_carro.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+
+        self.informations_section.setFixedHeight(
+            (
+            self.car_image.pixmap().height() +
+            self.lbl_car_color.height() * 6 +
+             20 * 6 +
+             # BORDER SIZE TIMES TWO BECAUSE ITS THE UPPER AND BOTTOM AT THE SAME TIME
+            self.informations_section.border_size * 2+
+            self.btn_alugar_carro.height()
+             )
+        )
+
         self.informations_section.move(
             self.width() // 2 - self.informations_section.width() // 2,
             self.height() // 2

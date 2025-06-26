@@ -68,10 +68,25 @@ car_informations_view = """
     background-color: #484848;
 """
 
-lbl_car_info = """
-    background-color: blue;
+informations_section = """
+    background-color:#303030;
+    border-radius: 15px;
 """
 
-informations_section = """
-    
+car_image = """
+
+"""
+
+divisory = """
+    background: #454545;
+    border-radius: 10px;
+"""
+
+lbl_car_info = """
+    background-color: none;
+"""
+
+btn_alugar_carro = """
+    background-color: blue;
+    border-radius: 15px;
 """
