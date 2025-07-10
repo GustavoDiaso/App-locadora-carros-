@@ -87,6 +87,9 @@ lbl_car_info = """
 """
 
 btn_alugar_carro = """
-    background-color: blue;
+    background-color:#afafaf ;
     border-radius: 15px;
+    font-weight: 800;
+    font-size: 18px;
+    color: #454545;
 """
